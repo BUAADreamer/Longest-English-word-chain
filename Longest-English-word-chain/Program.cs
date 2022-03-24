@@ -8,7 +8,7 @@ class Program
         try
         {
             string path = 
-                "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TextFile2.txt";
+                "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TextFile1.txt";
             Console.WriteLine(path);
             WordListMaker maker = new WordListMaker();
             string article = maker.getArticleByPath(path);
