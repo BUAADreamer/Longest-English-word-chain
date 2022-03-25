@@ -28,11 +28,13 @@ public class WordListMaker
         }
         return res;
     }
+
     public ArrayList makeWordList(string article)
     {
         ArrayList wordList = new ArrayList();
         int len = article.Length;
         int pos = 0;
+        article = article.ToLower();
         while (pos < len)
         {
             while (pos < len)
@@ -62,7 +64,7 @@ public class WordListMaker
             }
             if (currentWord != "" && currentWord.Length>1)
             {
-                wordList.Add(currentWord);
+                wordList.Add(currentWord.ToLower());
             }
         }
         return wordList;

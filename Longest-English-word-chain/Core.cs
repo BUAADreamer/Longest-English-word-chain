@@ -81,7 +81,6 @@ public class Num
     public Num(ArrayList words)
     {
         this.words = words;
-        
         //建立两个从首尾字母和相应字母的映射
         //初始化ArrayList of ArrayList
         for (int i = 0; i < 26; i++)
