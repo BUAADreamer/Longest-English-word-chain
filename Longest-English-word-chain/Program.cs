@@ -7,10 +7,10 @@ class Program
     {
         try
         {
-            //string path = 
-            //    "C:/Users/dell/Desktop/Longest-English-word-chain/Longest-English-word-chain/TextFile1.txt";
             string path = 
-                "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TextFile2.txt";
+                "C:/Users/dell/Desktop/Longest-English-word-chain/Longest-English-word-chain/TextFile2.txt";
+            //string path = 
+            //    "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TextFile2.txt";
             // Console.WriteLine(path);
             WordListMaker maker = new WordListMaker();
             string article = maker.getArticleByPath(path);
@@ -27,7 +27,12 @@ class Program
             */
 
             ZcxCore core = new ZcxCore(wordList);
-            Console.WriteLine(core.getMaxWordCountChain());
+            ArrayList res = new ArrayList();
+            Console.WriteLine(core.getMaxAlphabetCountChain(res));
+            for (int i = 0; i < res.Count; i++) 
+            {
+                Console.WriteLine(res[i]);
+            }
         }
         catch (Exception e)
         {

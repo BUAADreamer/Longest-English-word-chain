@@ -52,8 +52,12 @@ public class ZcxCore
         }
 		for (int i = 0; i < len; i++) 
 		{
-			for (int j = i + 1; j < len; j++) 
+			for (int j = 0; j < len; j++) 
 			{
+				if (i == j) 
+				{
+					continue;
+				}
 				int len1 =( (string)words[i]).Length;
 				char lastCh = ((string)words[i])[len1 - 1];
 				char firstCh = ((string)words[j])[0];
@@ -65,9 +69,78 @@ public class ZcxCore
 		}
 	}
 
-	public int getMaxWordCountChain()
+	public int getMaxAlphabetCountChain(ArrayList res) 
+	{
+		Queue queue = new Queue();
+		Hashtable father = new Hashtable();
+		for (int i = 0; i < words.Count; i++) 
+		{
+			if ((int)inDegree[(string)(words[i])] == 0)
+            {
+				queue.Enqueue((string)(words[i]));
+				word2len[(string)(words[i])] = ((string)(words[i])).Length;
+            }
+		}
+
+		// foreach (DictionaryEntry de in inDegree) 
+		// {
+		// 	Console.WriteLine((string)(de.Key));
+		// 	Console.WriteLine((int)(de.Value));
+		// }
+
+		while (queue.Count != 0)
+        {
+			string cur = (string)queue.Dequeue();
+			Hashtable curNext = (Hashtable)(graph[cur]);
+			foreach (DictionaryEntry next in curNext)
+            {
+				string key = (string)next.Key;
+				int degree = (int)inDegree[key];
+				inDegree[key] = degree - 1;
+				if ((int)word2len[key] < (int)(word2len[cur]) + key.Length) 
+				{
+					word2len[key] = Math.Max((int)word2len[key], (int)(word2len[cur]) + key.Length);
+					father.Add((string)key, (string)cur);
+				}
+				if (degree - 1 == 0)
+                {
+					queue.Enqueue(key);
+                }
+            }
+        }
+		int ans = 0;
+		string lastWord = "";
+		foreach (DictionaryEntry de in word2len)
+        {
+			int value = (int)de.Value;
+			ans = Math.Max(ans, value);
+			if (value == ans) 
+			{
+				lastWord = (string)de.Key;
+			}
+        }
+
+		ArrayList reversedRes = new ArrayList();
+		reversedRes.Add(lastWord);
+		string currentWord = lastWord;
+		string nextWord = "";
+		while (father.ContainsKey(currentWord)) 
+		{
+			nextWord = (string)father[currentWord];
+			reversedRes.Add(nextWord);
+			currentWord = nextWord;
+		}
+		for (int i = reversedRes.Count - 1; i >= 0; i--) {
+			res.Add(reversedRes[i]);
+		}
+
+		return ans;
+	}
+
+	public int getMaxWordCountChain(ArrayList res)
     {
 		Queue queue = new Queue();
+		Hashtable father = new Hashtable();
 		for (int i = 0; i < words.Count; i++)
         {
 			if ((int)inDegree[(string)(words[i])] == 0)
@@ -79,14 +152,17 @@ public class ZcxCore
 		while (queue.Count != 0)
         {
 			string cur = (string)queue.Dequeue();
-			Console.WriteLine(cur);
 			Hashtable curNext = (Hashtable)(graph[cur]);
 			foreach (DictionaryEntry next in curNext)
             {
 				string key = (string)next.Key;
 				int degree = (int)inDegree[key];
 				inDegree[key] = degree - 1;
-				word2len[key] = Math.Max((int)word2len[key], (int)(word2len[cur]) + 1);
+				if ((int)word2len[key] < (int)(word2len[cur]) + 1) 
+				{
+					word2len[key] = Math.Max((int)word2len[key], (int)(word2len[cur]) + 1);
+					father.Add((string)key, (string)cur);
+				}
 				if (degree - 1 == 0)
                 {
 					queue.Enqueue(key);
@@ -94,11 +170,32 @@ public class ZcxCore
             }
         }
 		int ans = 0;
+		string lastWord = "";
 		foreach (DictionaryEntry de in word2len)
         {
 			int value = (int)de.Value;
 			ans = Math.Max(ans, value);
+			if (value == ans) 
+			{
+				lastWord = (string)de.Key;
+			}
         }
+
+		ArrayList reversedRes = new ArrayList();
+		reversedRes.Add(lastWord);
+		string currentWord = lastWord;
+		string nextWord = "";
+		while (father.ContainsKey(currentWord)) 
+		{
+			nextWord = (string)father[currentWord];
+			reversedRes.Add(nextWord);
+			currentWord = nextWord;
+		}
+		for (int i = reversedRes.Count - 1; i >= 0; i--) 
+		{
+			res.Add(reversedRes[i]);
+		}
+
 		return ans;
     }
 }
