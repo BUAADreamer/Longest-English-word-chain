@@ -8,7 +8,7 @@ class Program
         try
         {
             string path = 
-                "C:/Users/dell/Desktop/Longest-English-word-chain/Longest-English-word-chain/TextFile1.txt";
+                "C:/Users/dell/Desktop/Longest-English-word-chain/Longest-English-word-chain/TextFile4.txt";
             //string path = 
             //    "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TextFile2.txt";
             // Console.WriteLine(path);
@@ -31,7 +31,7 @@ class Program
             // core.getAllWordChains('0', '0', true, res);
             // Output output = new Output();
             // output.printWordChains(res);
-            Console.WriteLine(core.getMaxAlphabetCountChain('a', '0', true));
+            Console.WriteLine(core.getMaxWordCountChainWithDifferentHead());
         }
         catch (Exception e)
         {
