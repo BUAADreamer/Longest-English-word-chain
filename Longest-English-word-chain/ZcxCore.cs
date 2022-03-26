@@ -192,7 +192,8 @@ public class ZcxCore
 		return false;
 	}
 
-	private void getWordChain(ArrayList currentChain, string currentWord, char start, char end, HashSet<string> res) 
+	private void getWordChain(ArrayList currentChain, string currentWord,
+		char start, char end, HashSet<string> res) 
 	{
 		currentChain.Add(currentWord);
 		if (currentChain.Count > 1 
@@ -361,127 +362,72 @@ public class ZcxCore
 		}
 	}
 
-	public int getMaxAlphabetCountChain(ArrayList res) 
+	private void getWordChainWithDifferentHead(ArrayList currentChain, string currentWord,
+		HashSet<string> res, HashSet<char> charSet) 
 	{
-		Queue queue = new Queue();
-		Hashtable father = new Hashtable();
-		for (int i = 0; i < words.Count; i++) 
+		currentChain.Add(currentWord);
+		charSet.Add(currentWord[0]);
+		if (currentChain.Count > 1)
 		{
-			if ((int)inDegree[(string)(words[i])] == 0)
-            {
-				queue.Enqueue((string)(words[i]));
-				word2len[(string)(words[i])] = ((string)(words[i])).Length;
-            }
-		}
-
-		while (queue.Count != 0)
-        {
-			string cur = (string)queue.Dequeue();
-			Hashtable curNext = (Hashtable)(graph[cur]);
-			foreach (DictionaryEntry next in curNext)
-            {
-				string key = (string)next.Key;
-				int degree = (int)inDegree[key];
-				inDegree[key] = degree - 1;
-				if ((int)word2len[key] < (int)(word2len[cur]) + key.Length) 
-				{
-					word2len[key] = Math.Max((int)word2len[key], (int)(word2len[cur]) + key.Length);
-					father.Add((string)key, (string)cur);
-				}
-				if (degree - 1 == 0)
-                {
-					queue.Enqueue(key);
-                }
-            }
-        }
-		int ans = 0;
-		string lastWord = "";
-		foreach (DictionaryEntry de in word2len)
-        {
-			int value = (int)de.Value;
-			ans = Math.Max(ans, value);
-			if (value == ans) 
+			string currentChainString = "";
+			for (int i = 0; i < currentChain.Count; i++) 
 			{
-				lastWord = (string)de.Key;
+				currentChainString += (string)currentChain[i];
+				currentChainString += " ";
 			}
-        }
+			res.Add(currentChainString);
+		}
 
-		ArrayList reversedRes = new ArrayList();
-		reversedRes.Add(lastWord);
-		string currentWord = lastWord;
-		string nextWord = "";
-		while (father.ContainsKey(currentWord)) 
+		// 选择下一个单词
+		Hashtable next = (Hashtable)graph[currentWord];
+		foreach (DictionaryEntry de in next)
 		{
-			nextWord = (string)father[currentWord];
-			reversedRes.Add(nextWord);
-			currentWord = nextWord;
-		}
-		for (int i = reversedRes.Count - 1; i >= 0; i--) {
-			res.Add(reversedRes[i]);
+			string nextWord = (string)de.Key;
+			// 不能有相同头的字符
+			if (charSet.Contains(nextWord[0]))
+			{
+				continue;
+			}
+			getWordChainWithDifferentHead(currentChain, nextWord, res, charSet);
 		}
 
-		return ans;
+		// 回溯删除当前单词
+		currentChain.RemoveAt(currentChain.Count - 1);
+		charSet.Remove(currentWord[0]);
 	}
 
-	public int getMaxWordCountChain(ArrayList res)
-    {
-		Queue queue = new Queue();
-		Hashtable father = new Hashtable();
-		for (int i = 0; i < words.Count; i++)
-        {
-			if ((int)inDegree[(string)(words[i])] == 0)
-            {
-				queue.Enqueue((string)(words[i]));
-            }
-        }
-
-		while (queue.Count != 0)
-        {
-			string cur = (string)queue.Dequeue();
-			Hashtable curNext = (Hashtable)(graph[cur]);
-			foreach (DictionaryEntry next in curNext)
-            {
-				string key = (string)next.Key;
-				int degree = (int)inDegree[key];
-				inDegree[key] = degree - 1;
-				if ((int)word2len[key] < (int)(word2len[cur]) + 1) 
-				{
-					word2len[key] = Math.Max((int)word2len[key], (int)(word2len[cur]) + 1);
-					father.Add((string)key, (string)cur);
-				}
-				if (degree - 1 == 0)
-                {
-					queue.Enqueue(key);
-                }
-            }
-        }
-		int ans = 0;
-		string lastWord = "";
-		foreach (DictionaryEntry de in word2len)
-        {
-			int value = (int)de.Value;
-			ans = Math.Max(ans, value);
-			if (value == ans) 
+	public string getMaxWordCountChainWithDifferentHead()
+	{
+		if (!dataCheck()) {
+			return "";
+		}
+		HashSet<string> chainSet = new HashSet<string>();
+		for (int i = 0; i < words.Count; i++) 
+		{
+			HashSet<char> charSet = new HashSet<char>();
+			string word = (string)words[i];
+			ArrayList chain = new ArrayList();
+			getWordChainWithDifferentHead(chain, word, chainSet, charSet);
+		}
+		int maxLen = 0;
+		string res = "";
+		foreach (string chain in chainSet)
+		{
+			int len = 0;
+			for (int i = 0; i < chain.Length; i++) 
 			{
-				lastWord = (string)de.Key;
+				// 统计个数
+				if (!isInvalidChar(chain[i]))
+				{
+					len++;
+				}
 			}
-        }
-
-		ArrayList reversedRes = new ArrayList();
-		reversedRes.Add(lastWord);
-		string currentWord = lastWord;
-		string nextWord = "";
-		while (father.ContainsKey(currentWord)) 
-		{
-			nextWord = (string)father[currentWord];
-			reversedRes.Add(nextWord);
-			currentWord = nextWord;
+			if (maxLen < len)
+			{
+				maxLen = len;
+				res = chain;
+			}
 		}
-		for (int i = reversedRes.Count - 1; i >= 0; i--) 
-		{
-			res.Add(reversedRes[i]);
-		}
-
-		return ans;
-    }
+		return res;
+	}
 }
