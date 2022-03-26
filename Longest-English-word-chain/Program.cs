@@ -28,9 +28,10 @@ class Program
             ZcxCore core = new ZcxCore(wordList, 0);
             ArrayList res = new ArrayList();
             // Console.WriteLine(core.getMaxAlphabetCountChain(res));
-            core.getAllWordChains('0', '0', true, res);
-            Output output = new Output();
-            output.printWordChains(res);
+            // core.getAllWordChains('0', '0', true, res);
+            // Output output = new Output();
+            // output.printWordChains(res);
+            Console.WriteLine(core.getMaxWordCountChain('e', '0', true));
         }
         catch (Exception e)
         {
