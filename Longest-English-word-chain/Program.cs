@@ -31,7 +31,7 @@ class Program
             // core.getAllWordChains('0', '0', true, res);
             // Output output = new Output();
             // output.printWordChains(res);
-            Console.WriteLine(core.getMaxWordCountChain('e', '0', true));
+            Console.WriteLine(core.getMaxAlphabetCountChain('a', '0', true));
         }
         catch (Exception e)
         {

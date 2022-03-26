@@ -288,7 +288,7 @@ public class ZcxCore
 					int len = 0;
 					for (int i = 0; i < chain.Length; i++) 
 					{
-						if (!isInvalidChar(chain[i]))
+						if (isInvalidChar(chain[i]))
 						{
 							len++;
 						}
@@ -308,6 +308,58 @@ public class ZcxCore
 			return "";
 		}
     }
+
+	public string getMaxAlphabetCountChain(char start, char end, bool checkLoop) 
+	{
+		// 如果需要检查是否有隐含环
+		if (checkLoop) 
+		{
+			// 如果确实有隐含环
+			if (!dataCheck()) 
+			{
+				Console.WriteLine("The words have loop!");
+				return "";
+			} 
+			// 如果没有环，就正常求解
+			else 
+			{
+				HashSet<string> chainSet = new HashSet<string>();
+				for (int i = 0; i < words.Count; i++) 
+				{
+					string word = (string)words[i];
+					if (word[0] == start || isInvalidChar(start))
+					{
+						ArrayList chain = new ArrayList();
+						getWordChain(chain, word, start, end, chainSet);
+					}
+				}
+				int maxLen = 0;
+				string res = "";
+				foreach (string chain in chainSet)
+				{
+					int len = 0;
+					for (int i = 0; i < chain.Length; i++) 
+					{
+						if (!isInvalidChar(chain[i]))
+						{
+							len++;
+						}
+					}
+					if (maxLen < len)
+					{
+						maxLen = len;
+						res = chain;
+					}
+				}
+				return res;
+			}
+		}
+		else
+		{
+			// TODO -r
+			return "";
+		}
+	}
 
 	public int getMaxAlphabetCountChain(ArrayList res) 
 	{
