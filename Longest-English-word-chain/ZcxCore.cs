@@ -223,10 +223,10 @@ public class ZcxCore
 		currentChain.RemoveAt(currentChain.Count - 1);
 	}
 
-	public int getAllWordChains(char start, char end, bool checkLoop, ArrayList res) 
+	public int getAllWordChains(char start, char end, bool enableLoop, ArrayList res) 
 	{
 		// 如果需要检查是否有隐含环
-		if (checkLoop) 
+		if (!enableLoop) 
 		{
 			// 如果确实有隐含环
 			if (!dataCheck()) 
@@ -261,10 +261,10 @@ public class ZcxCore
 		}
 	}
 
-	public int getMaxWordCountChain(char start, char end, bool checkLoop, ArrayList res)
+	public int getMaxWordCountChain(char start, char end, bool enableLoop, ArrayList res)
     {
 		// 如果需要检查是否有隐含环
-		if (checkLoop) 
+		if (!enableLoop) 
 		{
 			// 如果确实有隐含环
 			if (!dataCheck()) 
@@ -320,10 +320,10 @@ public class ZcxCore
 		}
     }
 
-	public int getMaxAlphabetCountChain(char start, char end, bool checkLoop, ArrayList res) 
+	public int getMaxAlphabetCountChain(char start, char end, bool enableLoop, ArrayList res) 
 	{
 		// 如果需要检查是否有隐含环
-		if (checkLoop) 
+		if (!enableLoop) 
 		{
 			// 如果确实有隐含环
 			if (!dataCheck()) 
