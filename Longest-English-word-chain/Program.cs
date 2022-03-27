@@ -12,7 +12,7 @@ class Program
         try
         {
             string path = 
-                "C:/Users/dell/Desktop/Longest-English-word-chain/Longest-English-word-chain/TextFile4.txt";
+                "C:/Users/dell/Desktop/Longest-English-word-chain/Longest-English-word-chain/TextFile5.txt";
             //string path = 
             //    "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TextFile2.txt";
             // Console.WriteLine(path);
@@ -31,11 +31,12 @@ class Program
             */
             ZcxCore core = new ZcxCore(wordList, 0);
             ArrayList res = new ArrayList();
-            // Console.WriteLine(core.getMaxAlphabetCountChain(res));
             // core.getAllWordChains('0', '0', true, res);
-            // Output output = new Output();
-            // output.printWordChains(res);
-            Console.WriteLine(core.getMaxWordCountChainWithDifferentHead());
+            core.getMaxAlphabetCountChain('a', '0', true, res);
+            // Console.WriteLine(core.getMaxAlphabetCountChain(res));
+            // core.getAllWordChains('0', '0', false, res);
+            Output output = new Output();
+            output.printWordChains(res, 0);
         }
         catch (Exception e)
         {
