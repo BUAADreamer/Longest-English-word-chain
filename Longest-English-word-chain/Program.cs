@@ -27,11 +27,12 @@ class Program
             */
             ZcxCore core = new ZcxCore(wordList, 0);
             ArrayList res = new ArrayList();
+            // core.getAllWordChains('0', '0', true, res);
+            core.getMaxAlphabetCountChain('a', '0', true, res);
             // Console.WriteLine(core.getMaxAlphabetCountChain(res));
             // core.getAllWordChains('0', '0', true, res);
-            // Output output = new Output();
-            // output.printWordChains(res);
-            Console.WriteLine(core.getMaxWordCountChainWithDifferentHead());
+            Output output = new Output();
+            output.printWordChains(res, 0);
         }
         catch (Exception e)
         {
