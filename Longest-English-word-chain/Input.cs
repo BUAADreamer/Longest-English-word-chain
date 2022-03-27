@@ -75,25 +75,22 @@ public class WordListMaker
 
 public class CommandParser
 {
-    //mode checkLoop start end
+    //mode enableLoop start end
     int mode = 0; //最长的模式 0表示单词数量 1表示字母个数
-    bool checkLoop = false;
+    bool enableLoop = false;
     char start;
     char end;
-    string output_path = "";
-    bool nFlag = false;
-    bool wFlag = false;
-    bool mFlag = false;
-    bool cFlag = false;
-    bool hflag = false;
-    bool tflag = false;
-    bool rflag = false;
+    string outputPath = "";
+    ParseRes parseRes;
+    HashSet<char> cmdChars = new HashSet<char>();
     ArrayList validCmdChars = new ArrayList(){ 'n', 'w', 'm', 'c', 'h', 't', 'r' };
     Hashtable char2ap = new Hashtable();
     Hashtable validCharPair = new Hashtable(); //validCharPair['n']['w']=false;
     public CommandParser(string[] args)
     {
+        init();
         parseCommand(args);
+        parseRes = new ParseRes(mode, enableLoop, start, end, outputPath, cmdChars)
     }
 
     private void init()
@@ -216,7 +213,7 @@ public class CommandParser
                 }
                 if (c == 'r')
                 {
-                    checkLoop = true;
+                    enableLoop = true;
                 }
                 if (c == 'w' || c == 'm' || c == 'c')
                 {
@@ -233,11 +230,12 @@ public class CommandParser
                 {
                     throw new CommandInvalidException("invalid arg at pos " + pos);
                 }
-                output_path = args[pos];
+                outputPath = args[pos];
             }
         }
         foreach(char c1 in char2ap.Keys)
         {
+            cmdChars.Add(c1);
             foreach (char c2 in char2ap.Keys)
             {
                 if ((bool)((Hashtable)validCharPair[c1])[c2]==false)
@@ -247,5 +245,28 @@ public class CommandParser
             }
         }
     }
-    
+    static public string[] ArgsMaker(string cmd)
+    {
+        return cmd.Split(" ");
+    }
+
+}
+
+public class ParseRes
+{
+    bool enableLoop = false;
+    char start;
+    char end;
+    string outputPath = "";
+    int mode = 0; //最长的模式 0表示单词数量 1表示字母个数
+    HashSet<char> cmdChars; 
+    public ParseRes(int mode,bool enableLoop,char start,char end,string outputPath,HashSet<char> cmdChars)
+    {
+        this.enableLoop = enableLoop;
+        this.mode = mode;
+        this.start = start;
+        this.end = end;
+        this.outputPath = outputPath;
+        this.cmdChars = cmdChars;
+    }
 }
