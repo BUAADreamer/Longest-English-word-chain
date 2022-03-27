@@ -6,9 +6,12 @@ public class Output
 	{
 	}
 
-    public void printWordChains(ArrayList wordChains)
+    public void printWordChains(ArrayList wordChains, int outputMode)
     {
-        Console.WriteLine(wordChains.Count);
+        if (outputMode == 0)
+        {
+            Console.WriteLine(wordChains.Count);
+        } 
         for (int i = 0; i < wordChains.Count; i++)
         {
             string wordChain = (string) wordChains[i];

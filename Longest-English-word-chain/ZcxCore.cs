@@ -10,12 +10,6 @@ public class ZcxCore
 	private Hashtable inDegree;
 	private Hashtable word2len;
 
-	public ZcxCore(ArrayList wordsList)
-	{
-		words = wordsList;
-		buildGraph();
-	}
-
 	// 构造方法：将所有单词存到 words 里面，并且参数化建图，words 中不能有重复单词
 	// mode 表示建图时点权的计算方法
 	// 如果 mode == 0，则意味着每个点点权为 1
@@ -102,49 +96,6 @@ public class ZcxCore
 		}
 	}
 
-	// 无参数建图，并统计每个单词的入度
-	private void buildGraph()
-	{
-		// graph 用于存图
-		graph = new Hashtable();
-		// inDegree 存储入度
-		inDegree = new Hashtable();
-		// word2len 存储每个结点的点权
-		// 如果是统计个数，则点权都是1
-		// 如果是统计字符数，则点权是单词长度
-		word2len = new Hashtable();
-		int len = words.Count;
-		for (int i = 0; i < len; i++)
-        {
-			inDegree.Add((string)(words[i]), 0);
-        }
-		for (int i = 0; i < len; i++)
-        {
-			word2len.Add((string)(words[i]), 1);
-		}
-		for (int i = 0; i < len; i++)
-        {
-			graph.Add((string)(words[i]), new Hashtable());
-        }
-		for (int i = 0; i < len; i++) 
-		{
-			for (int j = 0; j < len; j++) 
-			{
-				if (i == j) 
-				{
-					continue;
-				}
-				int len1 =( (string)words[i]).Length;
-				char lastCh = ((string)words[i])[len1 - 1];
-				char firstCh = ((string)words[j])[0];
-				if (lastCh == firstCh) 
-				{
-					addEdge((string)words[i], (string)words[j]);
-				}
-			}
-		}
-	}
-
 	// 用于判断是否指定 start 或者 end
 	// 如果指定了，那么 start 或者 end 应该是一个小写字母
 	private bool isInvalidChar(char ch) 
@@ -193,9 +144,10 @@ public class ZcxCore
 	}
 
 	private void getWordChain(ArrayList currentChain, string currentWord,
-		char start, char end, HashSet<string> res) 
+		char start, char end, HashSet<string> res, HashSet<string> usedWords) 
 	{
 		currentChain.Add(currentWord);
+		usedWords.Add(currentWord);
 		if (currentChain.Count > 1 
 			&& (currentWord[currentWord.Length - 1] == end || isInvalidChar(end)))
 		{
@@ -203,7 +155,10 @@ public class ZcxCore
 			for (int i = 0; i < currentChain.Count; i++) 
 			{
 				currentChainString += (string)currentChain[i];
-				currentChainString += " ";
+				if (i != currentChain.Count - 1)
+				{
+					currentChainString += " ";
+				}
 			}
 			res.Add(currentChainString);
 		}
@@ -213,153 +168,139 @@ public class ZcxCore
 		foreach (DictionaryEntry de in next)
 		{
 			string nextWord = (string)de.Key;
-			getWordChain(currentChain, nextWord, start, end, res);
+			if (!usedWords.Contains(nextWord))
+			{
+				getWordChain(currentChain, nextWord, start, end, res, usedWords);
+			}
 		}
 
 		// 回溯删除当前单词
 		currentChain.RemoveAt(currentChain.Count - 1);
+		usedWords.Remove(currentWord);
 	}
 
-	public int getAllWordChains(char start, char end, bool checkLoop, ArrayList res) 
+	public int getAllWordChains(char start, char end, bool enableLoop, ArrayList res) 
 	{
-		// 如果需要检查是否有隐含环
-		if (checkLoop) 
+		// 如果不允许有隐含环且确实含有隐含环
+		if (!enableLoop && !dataCheck()) 
 		{
-			// 如果确实有隐含环
-			if (!dataCheck()) 
-			{
-				Console.WriteLine("The words have loop!");
-				return 0;
-			} 
-			// 如果没有环，就正常求解
-			else 
-			{
-				HashSet<string> chainSet = new HashSet<string>();
-				for (int i = 0; i < words.Count; i++) 
-				{
-					string word = (string)words[i];
-					if (word[0] == start || isInvalidChar(start))
-					{
-						ArrayList chain = new ArrayList();
-						getWordChain(chain, word, start, end, chainSet);
-					}
-				}
-				foreach (string str in chainSet)
-				{
-					res.Add(str);
-				}
-				return res.Count;
-			}
-		}
-		else
-		{
-			// TODO -r
+			// TODO: 抛出数据有隐含环的异常
+			Console.WriteLine("The words have loop!");
 			return 0;
 		}
+
+		// 求解单词链
+		HashSet<string> chainSet = new HashSet<string>();
+		for (int i = 0; i < words.Count; i++) 
+		{
+			string word = (string)words[i];
+			if (word[0] == start || isInvalidChar(start))
+			{
+				ArrayList chain = new ArrayList();
+				HashSet<string> usedWords = new HashSet<string>();
+				getWordChain(chain, word, start, end, chainSet, usedWords);
+			}
+		}
+		foreach (string str in chainSet)
+		{
+			res.Add(str);
+		}
+		return res.Count;
 	}
 
-	public string getMaxWordCountChain(char start, char end, bool checkLoop)
+	public int getMaxWordCountChain(char start, char end, bool enableLoop, ArrayList res)
     {
-		// 如果需要检查是否有隐含环
-		if (checkLoop) 
+		// 如果不允许有环，并且数据中确实有环
+		if (!enableLoop && !dataCheck())
 		{
-			// 如果确实有隐含环
-			if (!dataCheck()) 
+			// TODO：数据有环的异常
+			Console.WriteLine("The words have loop!");
+			return 0;
+		}
+
+		HashSet<string> chainSet = new HashSet<string>();
+		for (int i = 0; i < words.Count; i++) 
+		{
+			string word = (string)words[i];
+			if (word[0] == start || isInvalidChar(start))
 			{
-				Console.WriteLine("The words have loop!");
-				return "";
-			} 
-			// 如果没有环，就正常求解
-			else 
-			{
-				HashSet<string> chainSet = new HashSet<string>();
-				for (int i = 0; i < words.Count; i++) 
-				{
-					string word = (string)words[i];
-					if (word[0] == start || isInvalidChar(start))
-					{
-						ArrayList chain = new ArrayList();
-						getWordChain(chain, word, start, end, chainSet);
-					}
-				}
-				int maxLen = 0;
-				string res = "";
-				foreach (string chain in chainSet)
-				{
-					int len = 0;
-					for (int i = 0; i < chain.Length; i++) 
-					{
-						if (isInvalidChar(chain[i]))
-						{
-							len++;
-						}
-					}
-					if (maxLen < len)
-					{
-						maxLen = len;
-						res = chain;
-					}
-				}
-				return res;
+				ArrayList chain = new ArrayList();
+				HashSet<string> usedWords = new HashSet<string>();
+				getWordChain(chain, word, start, end, chainSet, usedWords);
 			}
 		}
-		else
+		int maxLen = 0;
+		string longestChain = "";
+		foreach (string chain in chainSet)
 		{
-			// TODO -r
-			return "";
+			int len = 0;
+			for (int i = 0; i < chain.Length; i++) 
+			{
+				if (isInvalidChar(chain[i]))
+				{
+					len++;
+				}
+			}
+			if (maxLen < len)
+			{
+				maxLen = len;
+				longestChain = chain;
+			}
 		}
+		// 把单个单词链的空格改成换行
+		string[] substrings = longestChain.Split(' ');
+		foreach (string str in substrings) 
+		{
+			res.Add(str);
+		}
+		return maxLen;
     }
 
-	public string getMaxAlphabetCountChain(char start, char end, bool checkLoop) 
+	public int getMaxAlphabetCountChain(char start, char end, bool enableLoop, ArrayList res) 
 	{
 		// 如果需要检查是否有隐含环
-		if (checkLoop) 
+		if (!enableLoop && !dataCheck()) 
 		{
-			// 如果确实有隐含环
-			if (!dataCheck()) 
+			Console.WriteLine("The words have loop!");
+			return 0;
+		}
+		// 求解满足条件的单词链
+		HashSet<string> chainSet = new HashSet<string>();
+		for (int i = 0; i < words.Count; i++) 
+		{
+			string word = (string)words[i];
+			if (word[0] == start || isInvalidChar(start))
 			{
-				Console.WriteLine("The words have loop!");
-				return "";
-			} 
-			// 如果没有环，就正常求解
-			else 
-			{
-				HashSet<string> chainSet = new HashSet<string>();
-				for (int i = 0; i < words.Count; i++) 
-				{
-					string word = (string)words[i];
-					if (word[0] == start || isInvalidChar(start))
-					{
-						ArrayList chain = new ArrayList();
-						getWordChain(chain, word, start, end, chainSet);
-					}
-				}
-				int maxLen = 0;
-				string res = "";
-				foreach (string chain in chainSet)
-				{
-					int len = 0;
-					for (int i = 0; i < chain.Length; i++) 
-					{
-						if (!isInvalidChar(chain[i]))
-						{
-							len++;
-						}
-					}
-					if (maxLen < len)
-					{
-						maxLen = len;
-						res = chain;
-					}
-				}
-				return res;
+				ArrayList chain = new ArrayList();
+				HashSet<string> usedWords = new HashSet<string>();
+				getWordChain(chain, word, start, end, chainSet, usedWords);
 			}
 		}
-		else
+		int maxLen = 0;
+		string longestChain = "";
+		foreach (string chain in chainSet)
 		{
-			// TODO -r
-			return "";
+			int len = 0;
+			for (int i = 0; i < chain.Length; i++) 
+			{
+				if (!isInvalidChar(chain[i]))
+				{
+					len++;
+				}
+			}
+			if (maxLen < len)
+			{
+				maxLen = len;
+				longestChain = chain;
+			}
 		}
+		// 把单个单词链的空格改成换行
+		string[] substrings = longestChain.Split(' ');
+		foreach (string str in substrings)
+		{
+			res.Add(str);
+		}
+		return maxLen;
 	}
 
 	private void getWordChainWithDifferentHead(ArrayList currentChain, string currentWord,
@@ -373,7 +314,10 @@ public class ZcxCore
 			for (int i = 0; i < currentChain.Count; i++) 
 			{
 				currentChainString += (string)currentChain[i];
-				currentChainString += " ";
+				if (i != currentChain.Count - 1)
+				{
+					currentChainString += " ";
+				}
 			}
 			res.Add(currentChainString);
 		}
@@ -396,10 +340,11 @@ public class ZcxCore
 		charSet.Remove(currentWord[0]);
 	}
 
-	public string getMaxWordCountChainWithDifferentHead()
+	public int getMaxWordCountChainWithDifferentHead(ArrayList res)
 	{
 		if (!dataCheck()) {
-			return "";
+			// TODO:抛出单词有隐含环异常
+			return 0;
 		}
 		HashSet<string> chainSet = new HashSet<string>();
 		for (int i = 0; i < words.Count; i++) 
@@ -410,7 +355,7 @@ public class ZcxCore
 			getWordChainWithDifferentHead(chain, word, chainSet, charSet);
 		}
 		int maxLen = 0;
-		string res = "";
+		string longestChain = "";
 		foreach (string chain in chainSet)
 		{
 			int len = 0;
@@ -425,9 +370,14 @@ public class ZcxCore
 			if (maxLen < len)
 			{
 				maxLen = len;
-				res = chain;
+				longestChain = chain;
 			}
 		}
-		return res;
+		string[] substrings = longestChain.Split(' ');
+		foreach (string str in substrings)
+		{
+			res.Add(str);
+		}
+		return maxLen;
 	}
 }
