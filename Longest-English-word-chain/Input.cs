@@ -279,3 +279,18 @@ public class ParseRes
         this.cmdChars = cmdChars;
     }
 }
+
+public class TestParse
+{
+    public TestParse()
+    {
+        int[] a = new int[4] { 0, 0, 0, 0 };
+        Console.WriteLine(a[0]);
+        testArray(a);
+        Console.WriteLine(a[0]);
+    }
+    public void testArray(int[] a)
+    {
+        a[0] = 1;
+    }
+}
