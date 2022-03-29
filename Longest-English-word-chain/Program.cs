@@ -1,14 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Collections;
+using System.Collections.Generic;
 class Program
 {
     static void Main(string[] args)
     {
-        foreach(string arg in args)
-        {
-            Console.WriteLine(arg);
-        }
         try
         {
             string path = 
@@ -16,30 +13,47 @@ class Program
             //string path = 
             //    "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TextFile2.txt";
             // Console.WriteLine(path);
+            CommandParser parser = new CommandParser(args);
+            ParseRes parseRes = parser.getParseRes();
             WordListMaker maker = new WordListMaker();
             string article = maker.getArticleByPath(path);
             ArrayList wordList = maker.makeWordList(article);
-            /*foreach (string word in wordList)
-            {
-                Console.WriteLine(word);
-            }*/
-            /*
-            Num coreNum = new Num(wordList);
-            ArrayList allWordChains = coreNum.getAllWordChains();
-            Output output = new Output();
-            output.printWordChains(allWordChains);
-            */
-            ZcxCore core = new ZcxCore(wordList, 0);
             ArrayList res = new ArrayList();
-            // core.getAllWordChains('0', '0', true, res);
-            core.getMaxAlphabetCountChain('a', '0', true, res);
-            // Console.WriteLine(core.getMaxAlphabetCountChain(res));
-            // core.getAllWordChains('0', '0', false, res);
+            HashSet<char> parameters = parseRes.cmdChars;
+            ZcxCore core = new ZcxCore(wordList, parseRes.mode);
+            if (parameters.Contains('n'))
+            {   
+                core.getAllWordChains(parseRes.start, parseRes.end, parseRes.enableLoop, res);
+            }
+            else if (parameters.Contains('w')) 
+            {
+                core.getMaxWordCountChain(
+                    parseRes.start, parseRes.end, parseRes.enableLoop, res);
+            }
+            else if (parameters.Contains('m'))
+            {
+                core.getMaxWordCountChainWithDifferentHead(res);
+            }
+            else if (parameters.Contains('c'))
+            {
+                core.getMaxAlphabetCountChain(
+                    parseRes.start, parseRes.end, parseRes.enableLoop, res);
+            }
+            else 
+            {
+                Console.WriteLine("Invalid parameter!");
+            }
             Output output = new Output();
-            output.printWordChains(res, 0);
+            int outputMode = 1;
+            if (parameters.Contains('n'))
+            {
+                outputMode = 0;
+            }
+            output.printWordChains(res, outputMode);
         }
         catch (Exception e)
         {
+            Console.WriteLine(e.ToString());
             Console.WriteLine("error");
         }
     }
