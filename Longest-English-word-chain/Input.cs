@@ -90,7 +90,7 @@ public class CommandParser
     {
         init();
         parseCommand(args);
-        parseRes = new ParseRes(mode, enableLoop, start, end, outputPath, cmdChars)
+        parseRes = new ParseRes(mode, enableLoop, start, end, outputPath, cmdChars);
     }
 
     private void init()
@@ -268,5 +268,20 @@ public class ParseRes
         this.end = end;
         this.outputPath = outputPath;
         this.cmdChars = cmdChars;
+    }
+}
+
+public class TestParse
+{
+    public TestParse()
+    {
+        int[] a = new int[4] { 0, 0, 0, 0 };
+        Console.WriteLine(a[0]);
+        testArray(a);
+        Console.WriteLine(a[0]);
+    }
+    public void testArray(int[] a)
+    {
+        a[0] = 1;
     }
 }
