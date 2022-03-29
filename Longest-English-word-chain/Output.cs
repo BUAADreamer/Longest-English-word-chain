@@ -1,21 +1,33 @@
 ﻿using System;
 using System.Collections;
-public class Output
+using System.IO;
+namespace Core
 {
-	public Output()
-	{
-	}
-
-    public void printWordChains(ArrayList wordChains, int outputMode)
+    public class Output
     {
-        if (outputMode == 0)
+        public Output()
         {
-            Console.WriteLine(wordChains.Count);
-        } 
-        for (int i = 0; i < wordChains.Count; i++)
+        }
+
+        public void printWordChains(ArrayList wordChains, int outputMode)
         {
-            string wordChain = (string) wordChains[i];
-            Console.WriteLine(wordChain);
+            string outputStr = "";
+            if (outputMode == 0)
+            {
+                Console.WriteLine(wordChains.Count);
+                outputStr += wordChains.Count + "\n";
+            }
+            for (int i = 0; i < wordChains.Count; i++)
+            {
+                string wordChain = (string)wordChains[i];
+                Console.WriteLine(wordChain);
+                outputStr += wordChain + "\n";
+            }
+            string filePath = Path.GetFullPath("solution.txt");
+            StreamWriter sw = new StreamWriter(filePath, false);
+            sw.Write(outputStr);
+            sw.Flush();
+            sw.Close();
         }
     }
 }

@@ -1,24 +1,25 @@
 ﻿using System;
-public class WordsException:Exception
+namespace Core
 {
-	public WordsException(string message):base(message)
+	public class WordsException : Exception
 	{
+		public WordsException(string message) : base(message)
+		{
 
+		}
 	}
-}
 
-public class CommandComplexException : Exception
-{
-	public CommandComplexException(string message) : base(message)
+	public class CommandComplexException : Exception
 	{
-		message = "CommandComplexException:" + message + "\n";
+		public CommandComplexException(string message) : base("CommandComplexException:" + message)
+		{
+		}
 	}
-}
 
-public class CommandInvalidException : Exception
-{
-	public CommandInvalidException(string message) : base(message)
+	public class CommandInvalidException : Exception
 	{
-		message = "CommandInvalidException:" + message + "\n";
+		public CommandInvalidException(string message) : base("CommandInvalidException:" + message)
+		{
+		}
 	}
 }

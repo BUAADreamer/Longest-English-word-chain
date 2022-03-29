@@ -2,295 +2,297 @@
 using System.IO;
 using System;
 using System.Collections.Generic;
-
-public class WordListMaker
+namespace Core
 {
-    public WordListMaker()
+    public class WordListMaker
     {
-
-    }
-
-    public string getArticleByPath(string path)
-    {
-        string res = "";
-        try
+        public WordListMaker()
         {
-            StreamReader reader = new StreamReader(path);
-            string line = "";
-            while ((line = reader.ReadLine()) != null)
+
+        }
+
+        public string getArticleByPath(string path)
+        {
+            string res = "";
+            try
             {
-                res += line;
-                res += " ";
+                StreamReader reader = new StreamReader(path);
+                string line = "";
+                while ((line = reader.ReadLine()) != null)
+                {
+                    res += line;
+                    res += " ";
+                }
             }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return res;
         }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.Message);
-        }
-        return res;
-    }
 
-    public ArrayList makeWordList(string article)
-    {
-        
-        ArrayList wordList = new ArrayList();
-        int len = article.Length;
-        int pos = 0;
-        article = article.ToLower();
-        while (pos < len)
+        public ArrayList makeWordList(string article)
         {
+
+            ArrayList wordList = new ArrayList();
+            int len = article.Length;
+            int pos = 0;
+            article = article.ToLower();
             while (pos < len)
             {
-                if (article[pos] < 'a' || article[pos] > 'z')
+                while (pos < len)
                 {
-                    pos++;
-                } 
+                    if (article[pos] < 'a' || article[pos] > 'z')
+                    {
+                        pos++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                string currentWord = "";
+                while (pos < len)
+                {
+                    if (article[pos] >= 'a' && article[pos] <= 'z')
+                    {
+                        currentWord += article[pos];
+                        pos++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                if (currentWord != "" && currentWord.Length > 1)
+                {
+                    wordList.Add(currentWord.ToLower());
+                }
+            }
+            return wordList;
+        }
+    }
+
+    public class CommandParser
+    {
+        //mode enableLoop start end
+        int mode = 0; //最长的模式 0表示单词数量 1表示字母个数
+        bool enableLoop = false;
+        char start = '0';
+        char end = '0';
+        string absolutePathOfWordList = "";
+        ParseRes parseRes;
+        HashSet<char> cmdChars = new HashSet<char>();
+        ArrayList validCmdChars = new ArrayList() { 'n', 'w', 'm', 'c', 'h', 't', 'r' };
+        Hashtable char2ap = new Hashtable();
+        Hashtable validCharPair = new Hashtable(); //validCharPair['n']['w']=false;
+        public CommandParser(string[] args)
+        {
+            init();
+            parseCommand(args);
+            parseRes = new ParseRes(mode, enableLoop, start, end, absolutePathOfWordList, cmdChars);
+        }
+
+        private void init()
+        {
+            foreach (char c1 in validCmdChars)
+            {
+                validCharPair.Add(c1, new Hashtable());
+                foreach (char c2 in validCmdChars)
+                {
+
+                    if (c1 == c2)
+                    {
+                        ((Hashtable)validCharPair[c1]).Add(c2, false);
+                    }
+                    else if (c1 == 'n')
+                    {
+                        if (c2 == 'h' || c2 == 't' || c2 == 'r')
+                        {
+                            ((Hashtable)validCharPair[c1]).Add(c2, true);
+                        }
+                        else
+                        {
+                            ((Hashtable)validCharPair[c1]).Add(c2, false);
+                        }
+                    }
+                    else if (c1 == 'w')
+                    {
+                        if (c2 == 'h' || c2 == 't' || c2 == 'r')
+                        {
+                            ((Hashtable)validCharPair[c1]).Add(c2, true);
+                        }
+                        else
+                        {
+                            ((Hashtable)validCharPair[c1]).Add(c2, false);
+                        }
+                    }
+                    else if (c1 == 'm')
+                    {
+                        ((Hashtable)validCharPair[c1]).Add(c2, false);
+                    }
+                    else if (c1 == 'c')
+                    {
+                        if (c2 == 'h' || c2 == 't' || c2 == 'r')
+                        {
+                            ((Hashtable)validCharPair[c1]).Add(c2, true);
+                        }
+                        else
+                        {
+                            ((Hashtable)validCharPair[c1]).Add(c2, false);
+                        }
+                    }
+                    else if (c1 == 'h')
+                    {
+                        if (c2 == 'm' || c2 == 'h')
+                        {
+                            ((Hashtable)validCharPair[c1]).Add(c2, false);
+                        }
+                        else
+                        {
+                            ((Hashtable)validCharPair[c1]).Add(c2, true);
+                        }
+                    }
+                    else if (c1 == 't')
+                    {
+                        if (c2 == 'm' || c2 == 't')
+                        {
+                            ((Hashtable)validCharPair[c1]).Add(c2, false);
+                        }
+                        else
+                        {
+                            ((Hashtable)validCharPair[c1]).Add(c2, true);
+                        }
+                    }
+                    else if (c1 == 'r')
+                    {
+                        if (c2 == 'm' || c2 == 'r')
+                        {
+                            ((Hashtable)validCharPair[c1]).Add(c2, false);
+                        }
+                        else
+                        {
+                            ((Hashtable)validCharPair[c1]).Add(c2, true);
+                        }
+                    }
+                }
+            }
+        }
+
+        public void parseCommand(string[] args)
+        {
+            int pos = 0;
+            while (pos < args.Length)
+            {
+                if (args[pos].Length >= 1 && args[pos][0] == '-')
+                {
+                    if (args[pos].Length != 2 || !validCmdChars.Contains(args[pos][1]))
+                    {
+                        throw new CommandInvalidException("invalid arg at pos " + pos);
+                    }
+                    char c = args[pos][1];
+                    if (char2ap.ContainsKey(c))
+                    {
+                        throw new CommandComplexException(string.Format("{0} and {1}", c, c));
+                    }
+                    char2ap.Add(c, 1);
+                    if (c == 'h' || c == 't')
+                    {
+                        if (pos + 1 >= args.Length || args[pos + 1].Length != 1 || !Char.IsLetter(args[pos + 1][0]))
+                        {
+                            throw new CommandInvalidException("invalid arg behind cmd " + c + " at pos " + pos);
+                        }
+                        char beginOrEnd = Char.ToLower(args[pos + 1][0]);
+                        if (c == 'h')
+                        {
+                            start = beginOrEnd;
+                        }
+                        else
+                        {
+                            end = beginOrEnd;
+                        }
+                        pos += 1;
+                    }
+                    if (c == 'r')
+                    {
+                        enableLoop = true;
+                    }
+                    if (c == 'w' || c == 'm' || c == 'c')
+                    {
+                        mode = 0;
+                    }
+                    else
+                    {
+                        mode = 1;
+                    }
+                    pos += 1;
+                }
                 else
                 {
-                    break;
+                    if (pos != args.Length - 1)
+                    {
+                        throw new CommandInvalidException("invalid arg at pos " + pos);
+                    }
+                    absolutePathOfWordList = args[pos];
+                    pos += 1;
                 }
             }
-
-            string currentWord = "";
-            while (pos < len)
+            foreach (char c1 in char2ap.Keys)
             {
-                if (article[pos] >= 'a' && article[pos] <= 'z')
+                cmdChars.Add(c1);
+                foreach (char c2 in char2ap.Keys)
                 {
-                    currentWord += article[pos];
-                    pos++;
+                    if ((bool)((Hashtable)validCharPair[c1])[c2] == false && c1 != c2)
+                    {
+                        throw new CommandComplexException(string.Format("{0} and {1}", c1, c2));
+                    }
                 }
-                else
-                {
-                    break;
-                }
-            }
-            if (currentWord != "" && currentWord.Length>1)
-            {
-                wordList.Add(currentWord.ToLower());
             }
         }
-        return wordList;
-    }
-}
-
-public class CommandParser
-{
-    //mode enableLoop start end
-    int mode = 0; //最长的模式 0表示单词数量 1表示字母个数
-    bool enableLoop = false;
-    char start = '0';
-    char end = '0';
-    string outputPath = "";
-    ParseRes parseRes;
-    HashSet<char> cmdChars = new HashSet<char>();
-    ArrayList validCmdChars = new ArrayList(){ 'n', 'w', 'm', 'c', 'h', 't', 'r' };
-    Hashtable char2ap = new Hashtable();
-    Hashtable validCharPair = new Hashtable(); //validCharPair['n']['w']=false;
-    public CommandParser(string[] args)
-    {
-        init();
-        parseCommand(args);
-        parseRes = new ParseRes(mode, enableLoop, start, end, outputPath, cmdChars);
-    }
-
-    private void init()
-    {
-        foreach(char c1 in validCmdChars)
+        static public string[] ArgsMaker(string cmd)
         {
-            validCharPair.Add(c1, new Hashtable());
-            foreach(char c2 in validCmdChars)
-            {
-                
-                if (c1 == c2)
-                {
-                    ((Hashtable)validCharPair[c1]).Add(c2, false);
-                }
-                else if (c1 == 'n')
-                {
-                    if(c2=='h' || c2=='t' || c2 == 'r')
-                    {
-                        ((Hashtable)validCharPair[c1]).Add(c2, true);
-                    }
-                    else
-                    {
-                        ((Hashtable)validCharPair[c1]).Add(c2, false);
-                    }
-                }
-                else if (c1 == 'w')
-                {
-                    if (c2 == 'h' || c2 == 't' || c2 == 'r')
-                    {
-                        ((Hashtable)validCharPair[c1]).Add(c2, true);
-                    }
-                    else
-                    {
-                        ((Hashtable)validCharPair[c1]).Add(c2, false);
-                    }
-                }
-                else if (c1 == 'm')
-                {
-                    ((Hashtable)validCharPair[c1]).Add(c2, false);
-                }
-                else if (c1 == 'c')
-                {
-                    if (c2 == 'h' || c2 == 't' || c2 == 'r')
-                    {
-                        ((Hashtable)validCharPair[c1]).Add(c2, true);
-                    }
-                    else
-                    {
-                        ((Hashtable)validCharPair[c1]).Add(c2, false);
-                    }
-                }
-                else if (c1 == 'h')
-                {
-                    if (c2 == 'm' || c2 == 'h')
-                    {
-                        ((Hashtable)validCharPair[c1]).Add(c2, false);
-                    }
-                    else
-                    {
-                        ((Hashtable)validCharPair[c1]).Add(c2, true);
-                    }
-                }
-                else if (c1 == 't')
-                {
-                    if (c2 == 'm' || c2 == 't')
-                    {
-                        ((Hashtable)validCharPair[c1]).Add(c2, false);
-                    }
-                    else
-                    {
-                        ((Hashtable)validCharPair[c1]).Add(c2, true);
-                    }
-                }
-                else if (c1 == 'r')
-                {
-                    if (c2 == 'm' || c2 == 'r')
-                    {
-                        ((Hashtable)validCharPair[c1]).Add(c2, false);
-                    }
-                    else
-                    {
-                        ((Hashtable)validCharPair[c1]).Add(c2, true);
-                    }
-                }
-            }
+            return cmd.Split(' ');
         }
-    }
 
-    public void parseCommand(string[] args)
-    {
-        int pos = 0;
-        while (pos < args.Length)
+        public ParseRes getParseRes()
         {
-            if (args[pos].Length>=1 && args[pos][0] == '-')
-            {
-                if(args[pos].Length!=2 || !validCmdChars.Contains(args[pos][1]))
-                {
-                    throw new CommandInvalidException("invalid arg at pos " + pos);
-                }
-                char c = args[pos][1];
-                if (char2ap.ContainsKey(c))
-                {
-                    Console.WriteLine("1");
-                    throw new CommandComplexException(string.Format("{0} and {1}", c, c));
-                }
-                char2ap.Add(c, 1);
-                if (c == 'h' || c == 't')
-                {
-                    if (pos + 1 >= args.Length || args[pos + 1].Length != 1 || Char.IsLetter(args[pos + 1][0]))
-                    {
-                        throw new CommandInvalidException("invalid arg behind pos " + pos);
-                    }
-                    char beginOrEnd = Char.ToLower(args[pos + 1][0]);
-                    if (c == 'h')
-                    {
-                        start = beginOrEnd;
-                    }
-                    else
-                    {
-                        end = beginOrEnd;
-                    }
-                    pos+=1;
-                }
-                if (c == 'r')
-                {
-                    enableLoop = true;
-                }
-                if (c == 'w' || c == 'm' || c == 'c')
-                {
-                    mode = 0;
-                }
-                else
-                {
-                    mode = 1;
-                }
-                pos+=1;
-            }
-            else
-            {
-                if (pos != args.Length - 1)
-                {
-                    throw new CommandInvalidException("invalid arg at pos " + pos);
-                }
-                outputPath = args[pos];
-            }
+            return parseRes;
         }
-        foreach(char c1 in char2ap.Keys)
+
+    }
+
+    public class ParseRes
+    {
+        public bool enableLoop = false;
+        public char start;
+        public char end;
+        public string absolutePathOfWordList = "";
+        public int mode = 0; //最长的模式 0表示单词数量 1表示字母个数
+        public HashSet<char> cmdChars;
+        public ParseRes(int mode, bool enableLoop, char start, char end, string absolutePathOfWordList, HashSet<char> cmdChars)
         {
-            cmdChars.Add(c1);
-            foreach (char c2 in char2ap.Keys)
-            {
-                if ((bool)((Hashtable)validCharPair[c1])[c2]==false && c1!=c2)
-                {
-                    throw new CommandComplexException(string.Format("{0} and {1}", c1, c2));
-                }
-            }
+            this.enableLoop = enableLoop;
+            this.mode = mode;
+            this.start = start;
+            this.end = end;
+            this.absolutePathOfWordList = absolutePathOfWordList;
+            this.cmdChars = cmdChars;
         }
     }
-    static public string[] ArgsMaker(string cmd)
-    {
-        return cmd.Split(' ');
-    }
 
-    public ParseRes getParseRes()
+    public class TestParse
     {
-        return parseRes;
-    }
-
-}
-
-public class ParseRes
-{
-    public bool enableLoop = false;
-    public char start;
-    public char end;
-    public string outputPath = "";
-    public int mode = 0; //最长的模式 0表示单词数量 1表示字母个数
-    public HashSet<char> cmdChars; 
-    public ParseRes(int mode,bool enableLoop,char start,char end,string outputPath,HashSet<char> cmdChars)
-    {
-        this.enableLoop = enableLoop;
-        this.mode = mode;
-        this.start = start;
-        this.end = end;
-        this.outputPath = outputPath;
-        this.cmdChars = cmdChars;
-    }
-}
-
-public class TestParse
-{
-    public TestParse()
-    {
-        int[] a = new int[4] { 0, 0, 0, 0 };
-        Console.WriteLine(a[0]);
-        testArray(a);
-        Console.WriteLine(a[0]);
-    }
-    public void testArray(int[] a)
-    {
-        a[0] = 1;
+        public TestParse()
+        {
+            int[] a = new int[4] { 0, 0, 0, 0 };
+            Console.WriteLine(a[0]);
+            testArray(a);
+            Console.WriteLine(a[0]);
+        }
+        public void testArray(int[] a)
+        {
+            a[0] = 1;
+        }
     }
 }
