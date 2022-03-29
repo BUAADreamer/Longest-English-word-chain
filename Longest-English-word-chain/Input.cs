@@ -78,8 +78,8 @@ public class CommandParser
     //mode enableLoop start end
     int mode = 0; //最长的模式 0表示单词数量 1表示字母个数
     bool enableLoop = false;
-    char start;
-    char end;
+    char start = '0';
+    char end = '0';
     string outputPath = "";
     ParseRes parseRes;
     HashSet<char> cmdChars = new HashSet<char>();
@@ -100,11 +100,12 @@ public class CommandParser
             validCharPair.Add(c1, new Hashtable());
             foreach(char c2 in validCmdChars)
             {
+                
                 if (c1 == c2)
                 {
                     ((Hashtable)validCharPair[c1]).Add(c2, false);
                 }
-                if (c1 == 'n')
+                else if (c1 == 'n')
                 {
                     if(c2=='h' || c2=='t' || c2 == 'r')
                     {
@@ -115,7 +116,7 @@ public class CommandParser
                         ((Hashtable)validCharPair[c1]).Add(c2, false);
                     }
                 }
-                if (c1 == 'w')
+                else if (c1 == 'w')
                 {
                     if (c2 == 'h' || c2 == 't' || c2 == 'r')
                     {
@@ -126,11 +127,11 @@ public class CommandParser
                         ((Hashtable)validCharPair[c1]).Add(c2, false);
                     }
                 }
-                if (c1 == 'm')
+                else if (c1 == 'm')
                 {
                     ((Hashtable)validCharPair[c1]).Add(c2, false);
                 }
-                if (c1 == 'c')
+                else if (c1 == 'c')
                 {
                     if (c2 == 'h' || c2 == 't' || c2 == 'r')
                     {
@@ -141,7 +142,7 @@ public class CommandParser
                         ((Hashtable)validCharPair[c1]).Add(c2, false);
                     }
                 }
-                if (c1 == 'h')
+                else if (c1 == 'h')
                 {
                     if (c2 == 'm' || c2 == 'h')
                     {
@@ -152,7 +153,7 @@ public class CommandParser
                         ((Hashtable)validCharPair[c1]).Add(c2, true);
                     }
                 }
-                if (c1 == 't')
+                else if (c1 == 't')
                 {
                     if (c2 == 'm' || c2 == 't')
                     {
@@ -163,7 +164,7 @@ public class CommandParser
                         ((Hashtable)validCharPair[c1]).Add(c2, true);
                     }
                 }
-                if (c1 == 'r')
+                else if (c1 == 'r')
                 {
                     if (c2 == 'm' || c2 == 'r')
                     {
@@ -192,6 +193,7 @@ public class CommandParser
                 char c = args[pos][1];
                 if (char2ap.ContainsKey(c))
                 {
+                    Console.WriteLine("1");
                     throw new CommandComplexException(string.Format("{0} and {1}", c, c));
                 }
                 char2ap.Add(c, 1);
@@ -210,6 +212,7 @@ public class CommandParser
                     {
                         end = beginOrEnd;
                     }
+                    pos+=1;
                 }
                 if (c == 'r')
                 {
@@ -223,6 +226,7 @@ public class CommandParser
                 {
                     mode = 1;
                 }
+                pos+=1;
             }
             else
             {
@@ -238,7 +242,7 @@ public class CommandParser
             cmdChars.Add(c1);
             foreach (char c2 in char2ap.Keys)
             {
-                if ((bool)((Hashtable)validCharPair[c1])[c2]==false)
+                if ((bool)((Hashtable)validCharPair[c1])[c2]==false && c1!=c2)
                 {
                     throw new CommandComplexException(string.Format("{0} and {1}", c1, c2));
                 }
@@ -247,19 +251,24 @@ public class CommandParser
     }
     static public string[] ArgsMaker(string cmd)
     {
-        return cmd.Split(" ");
+        return cmd.Split(' ');
+    }
+
+    public ParseRes getParseRes()
+    {
+        return parseRes;
     }
 
 }
 
 public class ParseRes
 {
-    bool enableLoop = false;
-    char start;
-    char end;
-    string outputPath = "";
-    int mode = 0; //最长的模式 0表示单词数量 1表示字母个数
-    HashSet<char> cmdChars; 
+    public bool enableLoop = false;
+    public char start;
+    public char end;
+    public string outputPath = "";
+    public int mode = 0; //最长的模式 0表示单词数量 1表示字母个数
+    public HashSet<char> cmdChars; 
     public ParseRes(int mode,bool enableLoop,char start,char end,string outputPath,HashSet<char> cmdChars)
     {
         this.enableLoop = enableLoop;
