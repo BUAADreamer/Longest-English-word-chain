@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Core;
 using System.Collections;
 namespace CoreTest
@@ -38,6 +39,7 @@ namespace CoreTest
 			TestOneSample(args5);
 			String[] args6 = { "-r","-w", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TextFile3.txt" };
 			TestOneSample(args6);
+			//Program.Main(args1);
 		}
 		[TestMethod]
 		public void CoreTest2()
