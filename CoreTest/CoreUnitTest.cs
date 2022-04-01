@@ -25,19 +25,19 @@ namespace CoreTest
 		 */
 		public void CoreTest1()
 		{
-			String[] args = { "-n", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TextFile1.txt" };
+			String[] args = { "-n", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TestFile1.txt" };
 			TestOneSample(args);
-			String[] args1 = { "-w", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TextFile2.txt" };
+			String[] args1 = { "-w", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TestFile2.txt" };
 			TestOneSample(args1);
-			String[] args2 = { "-m", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TextFile2.txt" };
+			String[] args2 = { "-m", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TestFile2.txt" };
 			TestOneSample(args2);
-			String[] args3 = { "-c", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TextFile2.txt" };
+			String[] args3 = { "-c", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TestFile2.txt" };
 			TestOneSample(args3);
-			String[] args4 = { "-h","e","-w", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TextFile2.txt" };
+			String[] args4 = { "-h","e","-w", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TestFile2.txt" };
 			TestOneSample(args4);
-			String[] args5 = { "-t", "t", "-w", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TextFile2.txt" };
+			String[] args5 = { "-t", "t", "-w", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TestFile2.txt" };
 			TestOneSample(args5);
-			String[] args6 = { "-r","-w", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TextFile3.txt" };
+			String[] args6 = { "-r","-w", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TestFile3.txt" };
 			TestOneSample(args6);
 			//Program.Main(args1);
 		}
@@ -45,7 +45,7 @@ namespace CoreTest
 		public void CoreTest2()
 		{
 			int testNum = 5;
-			String baseFile = "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TextFile{0}.txt";
+			String baseFile = "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TestFile{0}.txt";
 			String testFile = String.Format(baseFile,testNum);
             for (int j = 0; j < 26; j++)
             {
@@ -80,7 +80,7 @@ namespace CoreTest
 								argList[argList.Count - 1] = testFile;
 								TestOneSample(getArgs(argList));
 							}
-							/*
+							continue;
 							foreach (char c3 in validCmdChars)
 							{
 								argList = new ArrayList() { "-" + c1 };
@@ -99,6 +99,7 @@ namespace CoreTest
 									argList[argList.Count - 1] = testFile;
 									TestOneSample(getArgs(argList));
 								}
+								/*
 								foreach (char c4 in validCmdChars)
 								{
 									argList = new ArrayList() { "-" + c1 };
@@ -121,7 +122,8 @@ namespace CoreTest
 										TestOneSample(getArgs(argList));
 									}
 								}
-							}*/
+								*/
+							}
 						}
 					}
 				}
