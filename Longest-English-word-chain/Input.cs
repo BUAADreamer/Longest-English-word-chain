@@ -33,7 +33,7 @@ namespace Core
 
         public ArrayList makeWordList(string article)
         {
-
+            HashSet<string> wordSet = new HashSet<string>();
             ArrayList wordList = new ArrayList();
             int len = article.Length;
             int pos = 0;
@@ -67,8 +67,12 @@ namespace Core
                 }
                 if (currentWord != "" && currentWord.Length > 1)
                 {
-                    wordList.Add(currentWord.ToLower());
+                    wordSet.Add(currentWord.ToLower());
                 }
+            }
+            foreach (string word in wordSet)
+            {
+                wordList.Add(word);
             }
             return wordList;
         }
