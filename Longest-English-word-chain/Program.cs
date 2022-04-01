@@ -15,43 +15,14 @@ namespace Core
                 //string path = 
                 //    "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TextFile2.txt";
                 // Console.WriteLine(path);
+                //args = new String[] { "-n", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TextFile1.txt" };
                 CommandParser parser = new CommandParser(args);
                 ParseRes parseRes = parser.getParseRes();
                 WordListMaker maker = new WordListMaker();
                 string article = maker.getArticleByPath(parseRes.absolutePathOfWordList);
                 ArrayList wordList = maker.makeWordList(article);
-                ArrayList res = new ArrayList();
-                HashSet<char> parameters = parseRes.cmdChars;
-                Core core = new Core(wordList, parseRes.mode);
-                if (parameters.Contains('n'))
-                {
-                    core.getAllWordChains(parseRes.start, parseRes.end, parseRes.enableLoop, res);
-                }
-                else if (parameters.Contains('w'))
-                {
-                    core.getMaxWordCountChain(
-                        parseRes.start, parseRes.end, parseRes.enableLoop, res);
-                }
-                else if (parameters.Contains('m'))
-                {
-                    core.getMaxWordCountChainWithDifferentHead(res);
-                }
-                else if (parameters.Contains('c'))
-                {
-                    core.getMaxAlphabetCountChain(
-                        parseRes.start, parseRes.end, parseRes.enableLoop, res);
-                }
-                else
-                {
-                    Console.WriteLine("Invalid parameter!");
-                }
-                Output output = new Output();
-                int outputMode = 1;
-                if (parameters.Contains('n'))
-                {
-                    outputMode = 0;
-                }
-                output.printWordChains(res, outputMode);
+                CalcuCore core = new CalcuCore(wordList, parseRes);
+                core.runByArgs();
             }
             catch (Exception e)
             {

@@ -4,21 +4,59 @@ using System.Collections.Generic;
 using System.Runtime;
 namespace Core
 {
-	public class Core
+	public class CalcuCore
 	{
 		private ArrayList words;
 		private Hashtable graph;
 		private Hashtable inDegree;
 		private Hashtable word2len;
+		private ParseRes parseRes;
 
 		// 构造方法：将所有单词存到 words 里面，并且参数化建图，words 中不能有重复单词
 		// mode 表示建图时点权的计算方法
 		// 如果 mode == 0，则意味着每个点点权为 1
 		// 如果 mode == 1，则意味着每个点点权为该点单词长度
-		public Core(ArrayList wordsList, int mode)
+		public CalcuCore(ArrayList wordsList, ParseRes parseRes)
 		{
 			words = wordsList;
-			buildGraph(mode);
+			this.parseRes = parseRes;
+		}
+
+		//根据解析
+		public void runByArgs()
+		{
+			ArrayList res = new ArrayList();
+			HashSet<char> parameters = parseRes.cmdChars;
+			buildGraph(parseRes.mode); //TODO 不加这一行貌似会导致空引用错误
+			if (parameters.Contains('n'))
+			{
+				getAllWordChains(parseRes.start, parseRes.end, parseRes.enableLoop, res);
+			}
+			else if (parameters.Contains('w'))
+			{
+				getMaxWordCountChain(
+					parseRes.start, parseRes.end, parseRes.enableLoop, res);
+			}
+			else if (parameters.Contains('m'))
+			{
+				getMaxWordCountChainWithDifferentHead(res);
+			}
+			else if (parameters.Contains('c'))
+			{
+				getMaxAlphabetCountChain(
+					parseRes.start, parseRes.end, parseRes.enableLoop, res);
+			}
+			else
+			{
+				Console.WriteLine("Invalid parameter!");
+			}
+			Output output = new Output();
+			int outputMode = 1;
+			if (parameters.Contains('n'))
+			{
+				outputMode = 0;
+			}
+			output.printWordChains(res, outputMode);
 		}
 
 		// 建图加边：如果 a 的最后一个字母和 b 的第一个字母相同，则连一条有向边，并维护入度

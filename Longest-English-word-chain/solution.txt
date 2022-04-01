@@ -1,4 +1,1 @@
-table
-element
-teach
-heaven
+0
