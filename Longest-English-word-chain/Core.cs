@@ -25,7 +25,7 @@ namespace Core
 		//根据解析
 		public void runByArgs()
 		{
-			ArrayList res = new ArrayList();
+ 			ArrayList res = new ArrayList();
 			HashSet<char> parameters = parseRes.cmdChars;
 			buildGraph(parseRes.mode); //TODO 不加这一行貌似会导致空引用错误
 			if (parameters.Contains('n'))

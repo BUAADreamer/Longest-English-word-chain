@@ -15,7 +15,8 @@ namespace Core
                 //string path = 
                 //    "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TestFile2.txt";
                 // Console.WriteLine(path);
-                args = new String[] { "-n", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TestFile5.txt" };
+                args = new String[] { "-n", "-r", "C:/Users/dell/Desktop/Longest-English-word-chain/Longest-English-word-chain/TestFile4.txt" };
+                // args = new String[] { "-n", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TestFile5.txt" };
                 CommandParser parser = new CommandParser(args);
                 ParseRes parseRes = parser.getParseRes();
                 WordListMaker maker = new WordListMaker();
