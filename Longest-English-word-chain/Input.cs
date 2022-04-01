@@ -260,6 +260,11 @@ namespace Core
             return parseRes;
         }
 
+        public Hashtable getValidCharPair()
+        {
+            return validCharPair;
+        }
+
     }
 
     public class ParseRes

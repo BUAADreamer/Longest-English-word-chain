@@ -10,7 +10,18 @@ namespace CoreTest
 	[TestClass]
 	public class CoreUnitTest
 	{
+		Hashtable validCharPair;
+		ArrayList validCmdChars = new ArrayList() { 'n', 'w', 'm', 'c', 'h', 't', 'r' };
+		public CoreUnitTest()
+        {
+			validCharPair = getValidCharPair();
+
+		}
+
 		[TestMethod]
+		/**
+		 * 官方用例回归测试
+		 */
 		public void CoreTest1()
 		{
 			String[] args = { "-n", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TextFile1.txt" };
@@ -31,24 +42,130 @@ namespace CoreTest
 		[TestMethod]
 		public void CoreTest2()
 		{
-			
+			int testNum = 5;
+			String baseFile = "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TextFile{0}.txt";
+			String testFile = String.Format(baseFile,testNum);
+            for (int j = 0; j < 26; j++)
+            {
+				for(int k = 0; k < 26; k++)
+                {
+					String head = ('a' + j).ToString();
+					String tail = ('a' + k).ToString();
+					foreach (char c1 in validCmdChars)
+					{
+						ArrayList argList = new ArrayList() { "-" + c1 };
+						if (c1 == 't') argList.Add(tail);
+						if (c1 == 'h') argList.Add(head);
+						argList.Add("");
+						for (int i = 1; i <= testNum; i++)
+						{
+							testFile = String.Format(baseFile, i);
+							argList[argList.Count - 1] = testFile;
+							TestOneSample(getArgs(argList));
+						}
+						foreach (char c2 in validCmdChars)
+						{
+							argList = new ArrayList() { "-" + c1 };
+							if (c1 == 't') argList.Add(tail);
+							if (c1 == 'h') argList.Add(head);
+							argList.Add("-" + c2);
+							if (c2 == 't') argList.Add(tail);
+							if (c2 == 'h') argList.Add(head);
+							argList.Add("");
+							for (int i = 1; i <= testNum; i++)
+							{
+								testFile = String.Format(baseFile, i);
+								argList[argList.Count - 1] = testFile;
+								TestOneSample(getArgs(argList));
+							}
+							/*
+							foreach (char c3 in validCmdChars)
+							{
+								argList = new ArrayList() { "-" + c1 };
+								if (c1 == 't') argList.Add(tail);
+								if (c1 == 'h') argList.Add(head);
+								argList.Add("-" + c2);
+								if (c2 == 't') argList.Add(tail);
+								if (c2 == 'h') argList.Add(head);
+								argList.Add("-" + c3);
+								if (c3 == 't') argList.Add(tail);
+								if (c3 == 'h') argList.Add(head);
+								argList.Add("");
+								for (int i = 1; i <= testNum; i++)
+								{
+									testFile = String.Format(baseFile, i);
+									argList[argList.Count - 1] = testFile;
+									TestOneSample(getArgs(argList));
+								}
+								foreach (char c4 in validCmdChars)
+								{
+									argList = new ArrayList() { "-" + c1 };
+									if (c1 == 't') argList.Add(tail);
+									if (c1 == 'h') argList.Add(head);
+									argList.Add("-" + c2);
+									if (c2 == 't') argList.Add(tail);
+									if (c2 == 'h') argList.Add(head);
+									argList.Add("-" + c3);
+									if (c3 == 't') argList.Add(tail);
+									if (c3 == 'h') argList.Add(head);
+									argList.Add("-" + c4);
+									if (c4 == 't') argList.Add(tail);
+									if (c4 == 'h') argList.Add(head);
+									argList.Add("");
+									for (int i = 1; i <= testNum; i++)
+									{
+										testFile = String.Format(baseFile, i);
+										argList[argList.Count - 1] = testFile;
+										TestOneSample(getArgs(argList));
+									}
+								}
+							}*/
+						}
+					}
+				}
+            }
 		}
-
+		[TestMethod]
 		public void CoreTest3()
 		{
 			
 		}
 
+		public Hashtable getValidCharPair()
+		{
+			String[] args = { };
+			CommandParser commandParser = new CommandParser(args);
+			return commandParser.getValidCharPair();
+		}
+
+		public String[] getArgs(ArrayList argList)
+        {
+			String[] args = new String[argList.Count];
+			for(int i = 0; i < argList.Count; i++)
+            {
+				args[i] = (String)argList[i];
+            }
+			return args;
+        }
 
 		public void TestOneSample(String[] args)
         {
-			CommandParser parser = new CommandParser(args);
-			ParseRes parseRes = parser.getParseRes();
-			WordListMaker maker = new WordListMaker();
-			string article = maker.getArticleByPath(parseRes.absolutePathOfWordList);
-			ArrayList wordList = maker.makeWordList(article);
-			CalcuCore core = new CalcuCore(wordList, parseRes);
-			core.runByArgs();
+            try 
+			{
+				Console.WriteLine(args);
+				CommandParser parser = new CommandParser(args);
+				ParseRes parseRes = parser.getParseRes();
+				WordListMaker maker = new WordListMaker();
+				string article = maker.getArticleByPath(parseRes.absolutePathOfWordList);
+				ArrayList wordList = maker.makeWordList(article);
+				CalcuCore core = new CalcuCore(wordList, parseRes);
+				core.runByArgs();
+			} 
+			catch(Exception e)
+            {
+				Console.WriteLine(e);
+            }
+			
 		}
 	}
 }
