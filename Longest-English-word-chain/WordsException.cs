@@ -21,4 +21,11 @@ namespace Core
 		{
 		}
 	}
+
+	public class HasImplicitLoopException : Exception
+	{
+		public HasImplicitLoopException(string message) : base("The input words have Implicit loop!")
+		{
+		}
+	}
 }
