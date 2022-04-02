@@ -6,4 +6,10 @@
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Reference Include="Core">
+      <HintPath>Core.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
