@@ -6,20 +6,193 @@ namespace Core
 {
 	public class CalcuCore
 	{
-		private ArrayList words;
-		private Hashtable graph;
-		private Hashtable inDegree;
-		private Hashtable word2len;
-		private ParseRes parseRes;
+		private static ArrayList words;
+		private static Hashtable graph;
+		private static Hashtable inDegree;
+		private static Hashtable word2len;
+		private static ParseRes parseRes;
 
 		// 构造方法：将所有单词存到 words 里面，并且参数化建图，words 中不能有重复单词
 		// mode 表示建图时点权的计算方法
 		// 如果 mode == 0，则意味着每个点点权为 1
 		// 如果 mode == 1，则意味着每个点点权为该点单词长度
-		public CalcuCore(ArrayList wordsList, ParseRes parseRes)
+		public CalcuCore(ArrayList wordsList, ParseRes param)
 		{
 			words = wordsList;
-			this.parseRes = parseRes;
+			parseRes = param;
+		}
+
+		// 将sbyte**转化为字符串列表，用于把输入的sbyte形式的words转化成List<string>
+		public static unsafe List<string> convertBytesToWords(sbyte** bytes, int len) {
+            List<string> words = new List<string>();
+            for (int i = 0; i < len; i++) 
+			{
+                string curWord = "";
+                for (sbyte* p = bytes[i]; *p != 0; p++) 
+				{
+					curWord += (char)*p;
+                }
+                words.Add(curWord.ToString());
+            }
+            return words;
+        }
+
+		public static unsafe void convertWordsToBytes(List<string> words, sbyte** bytes) 
+		{
+            int n = words.Count;
+			for (int i = 0; i < n; i++)
+			{
+				sbyte *p = bytes[i];
+				int len = words[i].Length;
+				for (int j = 0; j < len; j++)
+				{
+					*p = (sbyte)words[i][j];
+					p++;
+				}
+				*p = (sbyte)'\0';
+			}
+        }
+
+        public static unsafe int gen_chain_word(
+			sbyte** words, int len, sbyte** result, char head, char tail, bool enable_loop) 
+		{
+			const int MAX_RESULT_SIZE = 20000;
+            List<string> list = convertBytesToWords(words, len);
+			CalcuCore.words = new ArrayList();
+			foreach (string str in list)
+			{
+				CalcuCore.words.Add(str);
+			}
+			CalcuCore.buildGraph(0);
+			ArrayList res = new ArrayList();
+			getMaxWordCountChain(head, tail, enable_loop, res);
+			List<string> resultWords = new List<string>();
+			int totalCharCount = 0;
+			for (int i = 0; i < res.Count; i++)
+			{
+				resultWords.Add((string)res[i]);
+				totalCharCount += ((string)res[i]).Length;
+			}
+			try
+			{
+				if (totalCharCount > MAX_RESULT_SIZE)
+				{
+					throw new ResultTooLongException("The result length is " + totalCharCount);
+				}
+				convertWordsToBytes(resultWords, result);
+				return res.Count;
+			}
+			catch (ResultTooLongException e)
+			{
+				Console.WriteLine(e.Message);
+				return res.Count;
+			}
+        }
+
+		public static unsafe int gen_chains_all(sbyte** words, int len, sbyte** result)
+		{
+			const int MAX_RESULT_SIZE = 20000;
+            List<string> list = convertBytesToWords(words, len);
+			CalcuCore.words = new ArrayList();
+			foreach (string str in list)
+			{
+				CalcuCore.words.Add(str);
+			}
+			CalcuCore.buildGraph(0);
+			ArrayList res = new ArrayList();
+			getAllWordChains('0', '0', false, res);
+			List<string> resultWords = new List<string>();
+			int totalCharCount = 0;
+			for (int i = 0; i < res.Count; i++)
+			{
+				resultWords.Add((string)res[i]);
+				totalCharCount += ((string)res[i]).Length;
+			}
+			try
+			{
+				if (totalCharCount > MAX_RESULT_SIZE)
+				{
+					throw new ResultTooLongException("The result length is " + totalCharCount);
+				}
+				convertWordsToBytes(resultWords, result);
+				return res.Count;
+			}
+			catch (ResultTooLongException e)
+			{
+				Console.WriteLine(e.Message);
+				return res.Count;
+			}
+		}
+
+		public static unsafe int gen_chain_word_unique(sbyte** words, int len, sbyte** result)
+		{
+			const int MAX_RESULT_SIZE = 20000;
+            List<string> list = convertBytesToWords(words, len);
+			CalcuCore.words = new ArrayList();
+			foreach (string str in list)
+			{
+				CalcuCore.words.Add(str);
+			}
+			CalcuCore.buildGraph(0);
+			ArrayList res = new ArrayList();
+			getMaxWordCountChainWithDifferentHead(res);
+			List<string> resultWords = new List<string>();
+			int totalCharCount = 0;
+			for (int i = 0; i < res.Count; i++)
+			{
+				resultWords.Add((string)res[i]);
+				totalCharCount += ((string)res[i]).Length;
+			}
+			try
+			{
+				if (totalCharCount > MAX_RESULT_SIZE)
+				{
+					throw new ResultTooLongException("The result length is " + totalCharCount);
+				}
+				convertWordsToBytes(resultWords, result);
+				return res.Count;
+			}
+			catch (ResultTooLongException e)
+			{
+				Console.WriteLine(e.Message);
+				return res.Count;
+			}
+		}
+
+		public static unsafe int gen_chain_char(
+			sbyte** words, int len, sbyte** result, char head, char tail, bool enable_loop)
+		{
+			const int MAX_RESULT_SIZE = 20000;
+            List<string> list = convertBytesToWords(words, len);
+			CalcuCore.words = new ArrayList();
+			foreach (string str in list)
+			{
+				CalcuCore.words.Add(str);
+			}
+			CalcuCore.buildGraph(1);
+			ArrayList res = new ArrayList();
+			getMaxAlphabetCountChain(head, tail, enable_loop, res);
+			List<string> resultWords = new List<string>();
+			int totalCharCount = 0;
+			for (int i = 0; i < res.Count; i++)
+			{
+				resultWords.Add((string)res[i]);
+				totalCharCount += ((string)res[i]).Length;
+			}
+			try
+			{
+				if (totalCharCount > MAX_RESULT_SIZE)
+				{
+					throw new ResultTooLongException("The result length is " + totalCharCount);
+				}
+				convertWordsToBytes(resultWords, result);
+				return res.Count;
+			}
+			catch (ResultTooLongException e)
+			{
+				Console.WriteLine(e.Message);
+				return res.Count;
+			}
 		}
 
 		//根据解析
@@ -61,7 +234,7 @@ namespace Core
 
 		// 建图加边：如果 a 的最后一个字母和 b 的第一个字母相同，则连一条有向边，并维护入度
 		// 从 a 指向 b 的有向边
-		private void addEdge(string a, string b)
+		private static void addEdge(string a, string b)
 		{
 			// 获取 a 对应的邻接链表，然后把 b 插进去
 			Hashtable cur = (Hashtable)graph[a];
@@ -77,7 +250,7 @@ namespace Core
 		// 参数化建图
 		// 如果 mode == 0，则意味着每个点点权为 1
 		// 如果 mode == 1，则意味着每个点点权为该点单词长度
-		private void buildGraph(int mode)
+		private static void buildGraph(int mode)
 		{
 			// graph 用于存图
 			graph = new Hashtable();
@@ -138,13 +311,13 @@ namespace Core
 
 		// 用于判断是否指定 start 或者 end
 		// 如果指定了，那么 start 或者 end 应该是一个小写字母
-		private bool isInvalidChar(char ch)
+		private static bool isInvalidChar(char ch)
 		{
 			return !(ch >= 'a' && ch <= 'z');
 		}
 
 		// 使用拓扑排序检查数据是否有隐含环
-		private bool dataCheck()
+		private static bool dataCheck()
 		{
 			Queue queue = new Queue();
 			int res = 0;
@@ -183,7 +356,7 @@ namespace Core
 			return false;
 		}
 
-		private void getWordChain(ArrayList currentChain, string currentWord,
+		private static void getWordChain(ArrayList currentChain, string currentWord,
 			char start, char end, HashSet<string> res, HashSet<string> usedWords)
 		{
 			currentChain.Add(currentWord);
@@ -219,7 +392,7 @@ namespace Core
 			usedWords.Remove(currentWord);
 		}
 
-		public int getAllWordChains(char start, char end, bool enableLoop, ArrayList res)
+		public static int getAllWordChains(char start, char end, bool enableLoop, ArrayList res)
 		{
 			// 如果不允许有隐含环且确实含有隐含环
 			if (!enableLoop && !dataCheck())
@@ -248,7 +421,7 @@ namespace Core
 			return res.Count;
 		}
 
-		public int getMaxWordCountChain(char start, char end, bool enableLoop, ArrayList res)
+		public static int getMaxWordCountChain(char start, char end, bool enableLoop, ArrayList res)
 		{
 			// 如果不允许有环，并且数据中确实有环
 			if (!enableLoop && !dataCheck())
@@ -296,7 +469,7 @@ namespace Core
 			return maxLen;
 		}
 
-		public int getMaxAlphabetCountChain(char start, char end, bool enableLoop, ArrayList res)
+		public static int getMaxAlphabetCountChain(char start, char end, bool enableLoop, ArrayList res)
 		{
 			// 如果需要检查是否有隐含环
 			if (!enableLoop && !dataCheck())
@@ -343,7 +516,7 @@ namespace Core
 			return maxLen;
 		}
 
-		private void getWordChainWithDifferentHead(ArrayList currentChain, string currentWord,
+		private static void getWordChainWithDifferentHead(ArrayList currentChain, string currentWord,
 			HashSet<string> res, HashSet<char> charSet)
 		{
 			currentChain.Add(currentWord);
@@ -380,7 +553,7 @@ namespace Core
 			charSet.Remove(currentWord[0]);
 		}
 
-		public int getMaxWordCountChainWithDifferentHead(ArrayList res)
+		public static int getMaxWordCountChainWithDifferentHead(ArrayList res)
 		{
 			if (!dataCheck())
 			{
