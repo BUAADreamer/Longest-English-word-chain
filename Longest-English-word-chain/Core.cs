@@ -23,7 +23,7 @@ namespace Core
 		}
 
 		//根据解析
-		public String runByArgs()
+		public string runByArgs()
 		{
  			ArrayList res = new ArrayList();
 			HashSet<char> parameters = parseRes.cmdChars;
