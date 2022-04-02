@@ -132,7 +132,8 @@ namespace CoreTest
 		[TestMethod]
 		public void CoreTest3()
 		{
-			
+			String[] args = { "-n", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TestFile1.txt" };
+			PairTestInterface.Solve(args);
 		}
 
 		public Hashtable getValidCharPair()

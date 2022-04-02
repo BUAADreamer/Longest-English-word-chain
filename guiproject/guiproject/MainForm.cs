@@ -90,20 +90,26 @@ namespace guiproject
 
         private void button4_Click(object sender, EventArgs e)
         {
+            Console.WriteLine("***********");
+            
             try
             {
-                String[] args = textBox3.Text.Split(" ");
+                string[] args = textBox3.Text.Split(" ");
                 CommandParser parser = new CommandParser(args);
                 ParseRes parseRes = parser.getParseRes();
                 WordListMaker maker = new WordListMaker();
-                string article = maker.getArticleByPath(parseRes.absolutePathOfWordList);
+                string article = textBox1.Text;
                 ArrayList wordList = maker.makeWordList(article);
                 CalcuCore core = new CalcuCore(wordList, parseRes);
-                core.runByArgs();
+                string outRes = core.runByArgs();
+                outRes = outRes.Replace("\n", "\r\n");
+                textBox2.Text = outRes;
             }
-            catch (Exception e)
+            catch (Exception error)
             {
-                Console.WriteLine(e.Message);
+                Console.WriteLine(error.Message);
+                toolTip1.IsBalloon = true;
+                toolTip1.Show("遇到了错误！！", textBox4, new Point(312, -80), 2000);
             }
             
         }
