@@ -23,7 +23,7 @@ namespace Core
 		}
 
 		//根据解析
-		public void runByArgs()
+		public String runByArgs()
 		{
  			ArrayList res = new ArrayList();
 			HashSet<char> parameters = parseRes.cmdChars;
@@ -56,7 +56,7 @@ namespace Core
 			{
 				outputMode = 0;
 			}
-			output.printWordChains(res, outputMode);
+			return output.printWordChains(res, outputMode);
 		}
 
 		// 建图加边：如果 a 的最后一个字母和 b 的第一个字母相同，则连一条有向边，并维护入度

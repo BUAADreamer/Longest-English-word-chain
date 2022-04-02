@@ -25,10 +25,11 @@ namespace Core
             return outputStr;
         }
 
-        public void printWordChains(ArrayList wordChains, int outputMode)
+        public String printWordChains(ArrayList wordChains, int outputMode)
         {
             string outputStr = getOutputStr(wordChains, outputMode);
             writeStrToFile(outputStr);
+            return outputStr;
         }
 
         public void writeStrToFile(string outputStr)
