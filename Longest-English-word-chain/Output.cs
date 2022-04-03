@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 namespace Core
 {
@@ -9,7 +10,7 @@ namespace Core
         {
         }
 
-        public string getOutputStr(ArrayList wordChains, int outputMode)
+        public string getOutputStr(List<string> wordChains, int outputMode)
         {
             string outputStr = "";
             if (outputMode == 0)
@@ -18,14 +19,14 @@ namespace Core
             }
             for (int i = 0; i < wordChains.Count; i++)
             {
-                string wordChain = (string)wordChains[i];
+                string wordChain = wordChains[i];
                 outputStr += wordChain + "\n";
             }
             Console.WriteLine(outputStr);
             return outputStr;
         }
 
-        public String printWordChains(ArrayList wordChains, int outputMode)
+        public String printWordChains(List<string> wordChains, int outputMode)
         {
             string outputStr = getOutputStr(wordChains, outputMode);
             writeStrToFile(outputStr);
