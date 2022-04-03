@@ -14,11 +14,4 @@ namespace Core
 		{
 		}
 	}
-
-	public class ResultTooLongException : Exception
-	{
-		public ResultTooLongException(string message) : base("The result is too long!" + message)
-		{
-		}
-	}
 }

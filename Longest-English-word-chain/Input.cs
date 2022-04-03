@@ -31,10 +31,10 @@ namespace Core
             return res;
         }
 
-        public ArrayList makeWordList(string article)
+        public List<string> makeWordList(string article)
         {
             HashSet<string> wordSet = new HashSet<string>();
-            ArrayList wordList = new ArrayList();
+            List<string> wordList = new List<string>();
             int len = article.Length;
             int pos = 0;
             article = article.ToLower();
