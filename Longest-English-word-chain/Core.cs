@@ -191,7 +191,7 @@ namespace Core
 			if (!enableLoop && !dataCheck())
 			{
 				// TODO: 抛出数据有隐含环的异常
-				Console.WriteLine("The words have loop!");
+				//Console.WriteLine("The words have loop!");
 				return 0;
 			}
 
@@ -213,14 +213,14 @@ namespace Core
 			}
 			return res.Count;
 		}
-
+		/*
 		public int getMaxWordCountChain(char start, char end, bool enableLoop, List<string> res)
 		{
 			// 如果不允许有环，并且数据中确实有环
 			if (!enableLoop && !dataCheck())
 			{
 				// TODO：数据有环的异常
-				Console.WriteLine("The words have loop!");
+				//Console.WriteLine("The words have loop!");
 				return 0;
 			}
 
@@ -261,13 +261,14 @@ namespace Core
 			}
 			return maxLen;
 		}
+		*/
 
 		public int getMaxAlphabetCountChain(char start, char end, bool enableLoop, List<string> res)
 		{
 			// 如果需要检查是否有隐含环
 			if (!enableLoop && !dataCheck())
 			{
-				Console.WriteLine("The words have loop!");
+				//Console.WriteLine("The words have loop!");
 				return 0;
 			}
 			// 求解满足条件的单词链

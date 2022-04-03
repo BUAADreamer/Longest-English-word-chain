@@ -5,6 +5,7 @@ using Core;
 using System.Collections;
 using Library;
 using System.Collections.Generic;
+using Cmd;
 
 namespace CoreTest
 {
@@ -16,6 +17,7 @@ namespace CoreTest
 	{
 		Hashtable validCharPair;
 		ArrayList validCmdChars = new ArrayList() { 'n', 'w', 'm', 'c', 'h', 't', 'r' };
+		int correctNum = 0;
 		public CoreUnitTest()
         {
 			validCharPair = getValidCharPair();
@@ -68,6 +70,7 @@ namespace CoreTest
 							argList[argList.Count - 1] = testFile;
 							TestOneSample(getArgs(argList));
 						}
+						//continue;
 						foreach (char c2 in validCmdChars)
 						{
 							argList = new ArrayList() { "-" + c1 };
@@ -83,6 +86,7 @@ namespace CoreTest
 								argList[argList.Count - 1] = testFile;
 								TestOneSample(getArgs(argList));
 							}
+							/*
 							continue;
 							foreach (char c3 in validCmdChars)
 							{
@@ -102,7 +106,6 @@ namespace CoreTest
 									argList[argList.Count - 1] = testFile;
 									TestOneSample(getArgs(argList));
 								}
-								/*
 								foreach (char c4 in validCmdChars)
 								{
 									argList = new ArrayList() { "-" + c1 };
@@ -125,18 +128,50 @@ namespace CoreTest
 										TestOneSample(getArgs(argList));
 									}
 								}
-								*/
+
 							}
+							*/
 						}
 					}
 				}
             }
+			Console.WriteLine(correctNum);
 		}
 		[TestMethod]
 		public void CoreTest3()
 		{
 			String[] args = { "-n", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TestFile1.txt" };
+			CmdTestInterface cmd = new CmdTestInterface();
+			CmdTestInterface.Solve(args, "");
+			PairTestInterface pair = new PairTestInterface();
 			TestOneSample(args);
+			List<string> words = new List<string>() { "gbps", "generate", "google", "growing", "handle", "handling", "hardware", "has", "have",
+				"having", "heavily", "hence", "high", "highly", "homogeneous", "host", "hosts", "how", "however", "hubs",
+				"hungry", "hurt", "identified", "ii", "illustrates", "impact", "impacting", "impairment", "impairments",
+				"implementable", "implemented", "improve", "in", "incast", "increase", "increases", "incremental",
+				"indistinguishable", "individual", "infrastructure", "internal", "internet", "into", "introduction",
+				"invest", "involve", "irrelevant", "is", "issues", "it", "kb", "keep", "key"};
+			PairTestInterface.gen_chains_all(words, new List<string>());
+			PairTestInterface.gen_chain_word(words, new List<string>() { }, 'g', 'e', true);
+			PairTestInterface.gen_chain_word_unique(words,new List<string>() { });
+			PairTestInterface.gen_chain_char(words, new List<string>(), 'g', 'e', true);
+			PairTestInterface.gen_chain_char(words, new List<string>(), 'g', 'e', false);
+		}
+		[TestMethod]
+		public void CoreTest4()
+		{
+			List<string> words = new List<string>() { "gbps", "generate", "google", "growing", "handle", "handling", "hardware", "has", "have",
+				"having", "heavily", "hence", "high", "highly", "homogeneous", "host", "hosts", "how", "however", "hubs",
+				"hungry", "hurt", "identified", "ii", "illustrates", "impact", "impacting", "impairment", "impairments",
+				"implementable", "implemented", "improve", "in", "incast", "increase", "increases", "incremental",
+				"indistinguishable", "individual", "infrastructure", "internal", "internet", "into", "introduction",
+				"invest", "involve", "irrelevant", "is", "issues", "it", "kb", "keep", "key",
+			"utilization", "vary", "vast", "very", "vision", "was", "we", "web", "well", "which", "while", "whose", "wide", "with", "without", "workflow", "workloads", "years"};
+			PairTestInterface.gen_chains_all(words, new List<string>());
+			PairTestInterface.gen_chain_word(words, new List<string>() { }, 'g', 'e', true);
+			PairTestInterface.gen_chain_word_unique(words, new List<string>() { });
+			PairTestInterface.gen_chain_char(words, new List<string>(), 'i', 'e', true);
+			PairTestInterface.gen_chain_char(words, new List<string>(), 'h', 't', false);
 		}
 
 		public Hashtable getValidCharPair()
@@ -172,10 +207,12 @@ namespace CoreTest
 				List<string> result = new List<string>();
 				PairTestInterface.gen_chain_word(wordList, result, parseRes.start, parseRes.end, parseRes.enableLoop);
 				Output output = new Output();
+				correctNum++;
+				//Console.WriteLine(correctNum);
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine(e.Message);
+				//Console.WriteLine(e.Message);
 			}
 		}
 	}
