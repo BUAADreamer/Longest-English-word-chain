@@ -112,6 +112,7 @@ namespace Core
                     }
                     else if (c1 == 'n')
                     {
+                        /*
                         if (c2 == 'h' || c2 == 't' || c2 == 'r')
                         {
                             ((Hashtable)validCharPair[c1]).Add(c2, true);
@@ -119,7 +120,8 @@ namespace Core
                         else
                         {
                             ((Hashtable)validCharPair[c1]).Add(c2, false);
-                        }
+                        }*/
+                        ((Hashtable)validCharPair[c1]).Add(c2, false);
                     }
                     else if (c1 == 'w')
                     {

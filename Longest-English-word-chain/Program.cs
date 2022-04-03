@@ -8,7 +8,7 @@ namespace Core
     {
         static void Main(string[] args)
         {
-            PairTestInterface.Solve(args);
+            PairTestInterface.Solve(args,"");
         }
 
     }

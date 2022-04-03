@@ -90,7 +90,9 @@ namespace guiproject
 
         private void button4_Click(object sender, EventArgs e)
         {
-            Console.WriteLine("***********");
+            //string[] args = textBox3.Text.Split(" ");
+            //string outRes = PairTestInterface.Solve(args, textBox1.Text);
+            //textBox2.Text = outRes.Replace("\n", "\r\n");
             
             try
             {
@@ -107,11 +109,11 @@ namespace guiproject
             }
             catch (Exception error)
             {
-                Console.WriteLine(error.Message);
-                toolTip1.IsBalloon = true;
-                toolTip1.Show("遇到了错误！！", textBox4, new Point(312, -80), 2000);
+                MessageBox.Show(error.Message);
+                //Console.WriteLine(error.Message);
+                //toolTip1.IsBalloon = true;
+                //toolTip1.Show("遇到了错误！！", textBox4, new Point(312, -80), 2000);
             }
-            
         }
 
         private void buttonn_Click(object sender, EventArgs e)

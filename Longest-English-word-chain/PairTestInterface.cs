@@ -9,14 +9,18 @@ namespace Core
         {
         }
 
-        public static string Solve(string[] args)
+        public static string Solve(string[] args,string inputArticle)
         {
             try
             {
                 CommandParser parser = new CommandParser(args);
                 ParseRes parseRes = parser.getParseRes();
                 WordListMaker maker = new WordListMaker();
-                string article = maker.getArticleByPath(parseRes.absolutePathOfWordList);
+                string article = inputArticle;
+                if (article == "")
+                {
+                    article = maker.getArticleByPath(parseRes.absolutePathOfWordList);
+                }
                 ArrayList wordList = maker.makeWordList(article);
                 CalcuCore core = new CalcuCore(wordList, parseRes);
                 return core.runByArgs();
