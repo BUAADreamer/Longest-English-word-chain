@@ -6,17 +6,31 @@ namespace Core
 {
 	public class CalcuCore
 	{
-		private ArrayList words;
+		private List<string> words;
 		private Hashtable graph;
 		private Hashtable inDegree;
 		private Hashtable word2len;
+		private char start;
+        private char end;
+        private bool enableLoop;
+		private int graphMode;
 		private ParseRes parseRes;
+
+        public CalcuCore(List<string> words, char head, char tail, bool enableLoop, int mode)
+        {
+            this.words = words;
+            start = head;
+            end = tail;
+            this.enableLoop = enableLoop;
+			graphMode = mode;
+			buildGraph(mode);
+        }
 
 		// 构造方法：将所有单词存到 words 里面，并且参数化建图，words 中不能有重复单词
 		// mode 表示建图时点权的计算方法
 		// 如果 mode == 0，则意味着每个点点权为 1
 		// 如果 mode == 1，则意味着每个点点权为该点单词长度
-		public CalcuCore(ArrayList wordsList, ParseRes param)
+		public CalcuCore(List<string> wordsList, ParseRes param)
 		{
 			words = wordsList;
 			parseRes = param;
@@ -25,7 +39,7 @@ namespace Core
 		//根据解析
 		public string runByArgs()
 		{
- 			ArrayList res = new ArrayList();
+ 			List<string> res = new List<string>();
 			HashSet<char> parameters = parseRes.cmdChars;
 			buildGraph(parseRes.mode); //TODO 不加这一行貌似会导致空引用错误
 			if (parameters.Contains('n'))
@@ -89,7 +103,7 @@ namespace Core
 			int len = words.Count;
 			for (int i = 0; i < len; i++)
 			{
-				inDegree.Add((string)(words[i]), 0);
+				inDegree.Add(words[i], 0);
 			}
 			// word2len 存储点权
 			// 如果是统计个数，则点权都是 1
@@ -99,21 +113,21 @@ namespace Core
 			{
 				for (int i = 0; i < len; i++)
 				{
-					word2len.Add((string)(words[i]), 1);
+					word2len.Add(words[i], 1);
 				}
 			}
 			else
 			{
 				for (int i = 0; i < len; i++)
 				{
-					word2len.Add((string)(words[i]), ((string)(words[i])).Length);
+					word2len.Add(words[i], words[i].Length);
 				}
 			}
 
 			// 给邻接表的每个表头结点开一个空的邻接链表
 			for (int i = 0; i < len; i++)
 			{
-				graph.Add((string)(words[i]), new Hashtable());
+				graph.Add(words[i], new Hashtable());
 			}
 
 			// O(n^2) 枚举每两个点，判断是否可以连边，注意不能自己连到自己
@@ -125,12 +139,12 @@ namespace Core
 					{
 						continue;
 					}
-					int len1 = ((string)words[i]).Length;
-					char lastCh = ((string)words[i])[len1 - 1];
-					char firstCh = ((string)words[j])[0];
+					int len1 = words[i].Length;
+					char lastCh = words[i][len1 - 1];
+					char firstCh = words[j][0];
 					if (lastCh == firstCh)
 					{
-						addEdge((string)words[i], (string)words[j]);
+						addEdge(words[i], words[j]);
 					}
 				}
 			}
@@ -152,9 +166,9 @@ namespace Core
 			// 把入度为 0 的点加入到队列中 
 			for (int i = 0; i < words.Count; i++)
 			{
-				if ((int)inDegree[(string)(words[i])] == 0)
+				if ((int)inDegree[words[i]] == 0)
 				{
-					queue.Enqueue((string)(words[i]));
+					queue.Enqueue(words[i]);
 				}
 			}
 
@@ -183,7 +197,7 @@ namespace Core
 			return false;
 		}
 
-		private void getWordChain(ArrayList currentChain, string currentWord,
+		private void getWordChain(List<string> currentChain, string currentWord,
 			char start, char end, HashSet<string> res, HashSet<string> usedWords)
 		{
 			currentChain.Add(currentWord);
@@ -194,7 +208,7 @@ namespace Core
 				string currentChainString = "";
 				for (int i = 0; i < currentChain.Count; i++)
 				{
-					currentChainString += (string)currentChain[i];
+					currentChainString += currentChain[i];
 					if (i != currentChain.Count - 1)
 					{
 						currentChainString += " ";
@@ -219,7 +233,7 @@ namespace Core
 			usedWords.Remove(currentWord);
 		}
 
-		public int getAllWordChains(char start, char end, bool enableLoop, ArrayList res)
+		public int getAllWordChains(char start, char end, bool enableLoop, List<string> res)
 		{
 			// 如果不允许有隐含环且确实含有隐含环
 			if (!enableLoop && !dataCheck())
@@ -233,10 +247,10 @@ namespace Core
 			HashSet<string> chainSet = new HashSet<string>();
 			for (int i = 0; i < words.Count; i++)
 			{
-				string word = (string)words[i];
+				string word = words[i];
 				if (word[0] == start || isInvalidChar(start))
 				{
-					ArrayList chain = new ArrayList();
+					List<string> chain = new List<string>();
 					HashSet<string> usedWords = new HashSet<string>();
 					getWordChain(chain, word, start, end, chainSet, usedWords);
 				}
@@ -248,7 +262,7 @@ namespace Core
 			return res.Count;
 		}
 
-		public int getMaxWordCountChain(char start, char end, bool enableLoop, ArrayList res)
+		public int getMaxWordCountChain(char start, char end, bool enableLoop, List<string> res)
 		{
 			// 如果不允许有环，并且数据中确实有环
 			if (!enableLoop && !dataCheck())
@@ -261,10 +275,10 @@ namespace Core
 			HashSet<string> chainSet = new HashSet<string>();
 			for (int i = 0; i < words.Count; i++)
 			{
-				string word = (string)words[i];
+				string word = words[i];
 				if (word[0] == start || isInvalidChar(start))
 				{
-					ArrayList chain = new ArrayList();
+					List<string> chain = new List<string>();
 					HashSet<string> usedWords = new HashSet<string>();
 					getWordChain(chain, word, start, end, chainSet, usedWords);
 				}
@@ -296,7 +310,7 @@ namespace Core
 			return maxLen;
 		}
 
-		public int getMaxAlphabetCountChain(char start, char end, bool enableLoop, ArrayList res)
+		public int getMaxAlphabetCountChain(char start, char end, bool enableLoop, List<string> res)
 		{
 			// 如果需要检查是否有隐含环
 			if (!enableLoop && !dataCheck())
@@ -308,10 +322,10 @@ namespace Core
 			HashSet<string> chainSet = new HashSet<string>();
 			for (int i = 0; i < words.Count; i++)
 			{
-				string word = (string)words[i];
+				string word = words[i];
 				if (word[0] == start || isInvalidChar(start))
 				{
-					ArrayList chain = new ArrayList();
+					List<string> chain = new List<string>();
 					HashSet<string> usedWords = new HashSet<string>();
 					getWordChain(chain, word, start, end, chainSet, usedWords);
 				}
@@ -343,7 +357,7 @@ namespace Core
 			return maxLen;
 		}
 
-		private void getWordChainWithDifferentHead(ArrayList currentChain, string currentWord,
+		private void getWordChainWithDifferentHead(List<string> currentChain, string currentWord,
 			HashSet<string> res, HashSet<char> charSet)
 		{
 			currentChain.Add(currentWord);
@@ -353,7 +367,7 @@ namespace Core
 				string currentChainString = "";
 				for (int i = 0; i < currentChain.Count; i++)
 				{
-					currentChainString += (string)currentChain[i];
+					currentChainString += currentChain[i];
 					if (i != currentChain.Count - 1)
 					{
 						currentChainString += " ";
@@ -380,7 +394,7 @@ namespace Core
 			charSet.Remove(currentWord[0]);
 		}
 
-		public int getMaxWordCountChainWithDifferentHead(ArrayList res)
+		public int getMaxWordCountChainWithDifferentHead(List<string> res)
 		{
 			if (!dataCheck())
 			{
@@ -391,8 +405,8 @@ namespace Core
 			for (int i = 0; i < words.Count; i++)
 			{
 				HashSet<char> charSet = new HashSet<char>();
-				string word = (string)words[i];
-				ArrayList chain = new ArrayList();
+				string word = words[i];
+				List<string> chain = new List<string>();
 				getWordChainWithDifferentHead(chain, word, chainSet, charSet);
 			}
 			int maxLen = 0;
