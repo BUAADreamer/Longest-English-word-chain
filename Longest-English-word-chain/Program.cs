@@ -8,7 +8,17 @@ class Program
 {
     static void Main(string[] args)
     {
-        Solve(args,"");
+        //CoreType:0 使用我们的Core
+        //CoreType:1 使用交换的Core
+        int CoreType = 0;
+        if (CoreType == 0)
+        {
+            Solve(args, "");
+        }
+        else
+        {
+            
+        }
     }
     public static string Solve(string[] args, string inputArticle)
     {

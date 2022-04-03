@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Core;
+using Library;
 
 namespace guiproject
 {
@@ -90,29 +91,33 @@ namespace guiproject
 
         private void button4_Click(object sender, EventArgs e)
         {
-            //string[] args = textBox3.Text.Split(" ");
-            //string outRes = PairTestInterface.Solve(args, textBox1.Text);
-            //textBox2.Text = outRes.Replace("\n", "\r\n");
-            
-            try
+            //CoreType:0 使用我们的Core
+            //CoreType:1 使用交换的Core
+            int CoreType = 0;
+            if (CoreType == 0)
             {
-                string[] args = textBox3.Text.Split(" ");
-                CommandParser parser = new CommandParser(args);
-                ParseRes parseRes = parser.getParseRes();
-                WordListMaker maker = new WordListMaker();
-                string article = textBox1.Text;
-                ArrayList wordList = maker.makeWordList(article);
-                CalcuCore core = new CalcuCore(wordList, parseRes);
-                string outRes = core.runByArgs();
-                outRes = outRes.Replace("\n", "\r\n");
-                textBox2.Text = outRes;
-            }
-            catch (Exception error)
+                try
+                {
+                    string[] args = textBox3.Text.Split(" ");
+                    CommandParser parser = new CommandParser(args);
+                    ParseRes parseRes = parser.getParseRes();
+                    WordListMaker maker = new WordListMaker();
+                    string article = textBox1.Text;
+                    List<string> wordList = maker.makeWordList(article);
+                    List<string> result = new List<string>();
+                    PairTestInterface.gen_chain_word(wordList, result, parseRes.start, parseRes.end, parseRes.enableLoop);
+                    Output output = new Output();
+                    string outputRes = output.printWordChains(result, 1);
+                    outputRes = outputRes.Replace("\n", "\r\n");
+                    textBox2.Text = outputRes;
+                }
+                catch (Exception error)
+                {
+                    MessageBox.Show(error.Message);
+                }
+            } else
             {
-                MessageBox.Show(error.Message);
-                //Console.WriteLine(error.Message);
-                //toolTip1.IsBalloon = true;
-                //toolTip1.Show("遇到了错误！！", textBox4, new Point(312, -80), 2000);
+
             }
         }
 
