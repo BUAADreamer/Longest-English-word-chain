@@ -3,6 +3,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Core;
 using System.Collections;
+using Library;
+using System.Collections.Generic;
+
 namespace CoreTest
 {
 	/**
@@ -133,7 +136,7 @@ namespace CoreTest
 		public void CoreTest3()
 		{
 			String[] args = { "-n", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TestFile1.txt" };
-			PairTestInterface.Solve(args);
+			TestOneSample(args);
 		}
 
 		public Hashtable getValidCharPair()
@@ -155,22 +158,25 @@ namespace CoreTest
 
 		public void TestOneSample(String[] args)
         {
-            try 
+			try
 			{
-				Console.WriteLine(args);
 				CommandParser parser = new CommandParser(args);
 				ParseRes parseRes = parser.getParseRes();
 				WordListMaker maker = new WordListMaker();
-				string article = maker.getArticleByPath(parseRes.absolutePathOfWordList);
-				ArrayList wordList = maker.makeWordList(article);
-				CalcuCore core = new CalcuCore(wordList, parseRes);
-				core.runByArgs();
-			} 
-			catch(Exception e)
-            {
-				Console.WriteLine(e);
-            }
-			
+				string article = "";
+				if (article == "")
+				{
+					article = maker.getArticleByPath(parseRes.absolutePathOfWordList);
+				}
+				List<string> wordList = maker.makeWordList(article);
+				List<string> result = new List<string>();
+				PairTestInterface.gen_chain_word(wordList, result, parseRes.start, parseRes.end, parseRes.enableLoop);
+				Output output = new Output();
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e.Message);
+			}
 		}
 	}
 }

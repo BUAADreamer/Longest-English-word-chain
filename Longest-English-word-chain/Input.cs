@@ -2,7 +2,7 @@
 using System.IO;
 using System;
 using System.Collections.Generic;
-namespace Core
+namespace Library
 {
     public class WordListMaker
     {

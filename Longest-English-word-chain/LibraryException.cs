@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Core
+namespace Library
 {
 	public class CommandComplexException : Exception
 	{

@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-namespace Core
+namespace Library
 {
     public class Output
     {

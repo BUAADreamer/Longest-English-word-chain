@@ -1,7 +1,9 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Core;
+using Library;
 using System.Collections;
+using System.Collections.Generic;
+
 namespace CoreTest
 {
 	[TestClass]
@@ -10,7 +12,7 @@ namespace CoreTest
 		[TestMethod]
 		public void OutputTest1()
 		{
-			ArrayList wordChains = new ArrayList() { "ab", "cd", "ef" };
+			List<string> wordChains = new List<string>() { "ab", "cd", "ef" };
 			int mode = 0;
 			string s = "3\nab\ncd\nef\n";
 			Output output = new Output();
