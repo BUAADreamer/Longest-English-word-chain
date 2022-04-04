@@ -142,7 +142,7 @@ namespace CoreTest
 		{
 			String[] args = { "-n", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TestFile1.txt" };
 			CmdTestInterface cmd = new CmdTestInterface();
-			CmdTestInterface.Solve(args, "");
+			TestOneSample(args);
 			PairTestInterface pair = new PairTestInterface();
 			TestOneSample(args);
 			List<string> words = new List<string>() { "gbps", "generate", "google", "growing", "handle", "handling", "hardware", "has", "have",
@@ -176,8 +176,8 @@ namespace CoreTest
 
 		public Hashtable getValidCharPair()
 		{
-			String[] args = { };
-			CommandParser commandParser = new CommandParser(args);
+			CommandParser commandParser;
+			commandParser = new CommandParser();
 			return commandParser.getValidCharPair();
 		}
 
@@ -193,7 +193,7 @@ namespace CoreTest
 
 		public void TestOneSample(String[] args)
         {
-			CmdTestInterface.Solve(args, "");
+			CmdTestInterface.Solve(args);
 		}
 	}
 }

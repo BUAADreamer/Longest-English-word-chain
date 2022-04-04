@@ -8,7 +8,7 @@ namespace Cmd
     {
         static void Main(string[] args)
         {
-            CmdTestInterface.Solve(args, "");
+            CmdTestInterface.Solve(args);
         }
         
     }
