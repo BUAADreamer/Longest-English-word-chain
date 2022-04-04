@@ -1,1 +1,1 @@
-csc /target:library /out:ZFCore\ZFCore.dll .\ZFCore\ZFCore.cs .\ZFCore\ZFPairTestInterface.cs .\ZFCore\ZFCoreException.cs
+csc /target:library /out:..\ZFCore\ZFCore.dll ..\ZFCore\ZFCore.cs ..\ZFCore\ZFPairTestInterface.cs ..\ZFCore\ZFCoreException.cs

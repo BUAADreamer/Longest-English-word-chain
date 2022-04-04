@@ -1,6 +1,6 @@
 using System;
 
-namespace ZFCore
+namespace Core
 {	
     public class ResultTooLongException : Exception
 	{

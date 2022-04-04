@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-namespace ZFCore
+namespace Core
 {
     public class PairTestInterface
     {

@@ -8,17 +8,7 @@ namespace Cmd
     {
         static void Main(string[] args)
         {
-            //CoreType:0 使用我们的Core
-            //CoreType:1 使用交换的Core
-            int CoreType = 0;
-            if (CoreType == 0)
-            {
-                CmdTestInterface.Solve(args, "");
-            }
-            else
-            {
-                CmdTestInterface.SolveByHy(args, "");
-            }
+            CmdTestInterface.Solve(args, "");
         }
         
     }

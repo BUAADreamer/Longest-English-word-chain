@@ -193,27 +193,7 @@ namespace CoreTest
 
 		public void TestOneSample(String[] args)
         {
-			try
-			{
-				CommandParser parser = new CommandParser(args);
-				ParseRes parseRes = parser.getParseRes();
-				WordListMaker maker = new WordListMaker();
-				string article = "";
-				if (article == "")
-				{
-					article = maker.getArticleByPath(parseRes.absolutePathOfWordList);
-				}
-				List<string> wordList = maker.makeWordList(article);
-				List<string> result = new List<string>();
-				PairTestInterface.gen_chain_word(wordList, result, parseRes.start, parseRes.end, parseRes.enableLoop);
-				Output output = new Output();
-				correctNum++;
-				//Console.WriteLine(correctNum);
-			}
-			catch (Exception e)
-			{
-				//Console.WriteLine(e.Message);
-			}
+			CmdTestInterface.Solve(args, "");
 		}
 	}
 }
