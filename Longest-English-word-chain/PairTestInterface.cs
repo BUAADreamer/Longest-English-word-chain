@@ -35,6 +35,7 @@ namespace Core
             {
                 result.Clear();
                 Console.WriteLine(e.Message);
+                throw new ResultTooLongException(e.Message);
             }
             return result.Count;
         }
@@ -51,6 +52,7 @@ namespace Core
             {
                 result.Clear();
                 Console.WriteLine(e.Message);
+                throw new ResultTooLongException(e.Message);
             }
             return result.Count;
         }
@@ -67,6 +69,7 @@ namespace Core
             {
                 result.Clear();
                 Console.WriteLine(e.Message);
+                throw new ResultTooLongException(e.Message);
             }
             return result.Count;
         }
@@ -84,6 +87,7 @@ namespace Core
             {
                 result.Clear();
                 Console.WriteLine(e.Message);
+                throw new ResultTooLongException(e.Message);
             }
             return result.Count;
         }
