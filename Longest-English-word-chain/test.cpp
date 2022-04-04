@@ -61,12 +61,30 @@ int main() {
     int cnt = 0;
     while (true) {
         string arg;
-        int idx = rand() % 2 + 2; 
+        int idx = rand() % 4; 
         arg += args[idx];
+		if (idx == 2 || idx == 3) {
+			int a = rand(), b = rand();
+			if (a > b) {
+				arg += " -r ";
+			}
+		}
+		if (idx > 1) {
+			int a = rand(), b = rand();
+			if (a > b) {
+				arg += " -h ";
+				arg += ('a' + rand() % 26);
+				arg += " ";
+			}
+			a = rand();
+			b = rand();
+			if (a > b) {
+				arg += " -t ";
+				arg += ('a' + rand() % 26);
+				arg += "";
+			}
+		}
         arg += " ";
-        if (idx == 2 || idx == 3) {
-            arg += "-r ";
-        } 
         arg += ".\\in.txt ";
         string arg1 = ".\\me.exe " + arg + "> me.txt";
         string arg2 = ".\\other.exe " + arg;
@@ -78,6 +96,7 @@ int main() {
         if (!check(idx)) {
             cout << "fuck" << endl;
             system("pause");
+			break;
         } else {
             cout << "test" + to_string(cnt) + " pass" << endl;
             cnt++;
