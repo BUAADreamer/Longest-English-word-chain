@@ -167,11 +167,53 @@ namespace CoreTest
 				"indistinguishable", "individual", "infrastructure", "internal", "internet", "into", "introduction",
 				"invest", "involve", "irrelevant", "is", "issues", "it", "kb", "keep", "key",
 			"utilization", "vary", "vast", "very", "vision", "was", "we", "web", "well", "which", "while", "whose", "wide", "with", "without", "workflow", "workloads", "years"};
-			PairTestInterface.gen_chains_all(words, new List<string>());
-			PairTestInterface.gen_chain_word(words, new List<string>() { }, 'g', 'e', true);
-			PairTestInterface.gen_chain_word_unique(words, new List<string>() { });
-			PairTestInterface.gen_chain_char(words, new List<string>(), 'i', 'e', true);
-			PairTestInterface.gen_chain_char(words, new List<string>(), 'h', 't', false);
+            try 
+			{ 
+				PairTestInterface.gen_chains_all(words, new List<string>()); 
+			} 
+			catch(Exception e) 
+			{ 
+				Console.WriteLine(e); 
+			}
+			try
+			{
+				PairTestInterface.gen_chains_all(words, new List<string>());
+			}
+			catch(Exception e)
+            {
+				Console.WriteLine(e);
+            }
+			try
+			{
+				PairTestInterface.gen_chain_word(words, new List<string>() { }, 'g', 'e', true);
+			}
+			catch(Exception e)
+            {
+				Console.WriteLine(e);
+            }
+            try
+            {
+				PairTestInterface.gen_chain_word_unique(words, new List<string>() { });
+			}
+			catch(Exception e)
+            {
+				Console.WriteLine(e);
+            }
+			try
+            {
+                PairTestInterface.gen_chain_word_unique(words, new List<string>() { });
+            }
+            catch (Exception e) { Console.WriteLine(e); }
+			try
+            {
+                PairTestInterface.gen_chain_char(words, new List<string>(), 'i', 'e', true);
+            }
+            catch (Exception e) { Console.WriteLine(e); }
+			try
+            {
+                PairTestInterface.gen_chain_char(words, new List<string>(), 'h', 't', false);
+            }
+            catch (Exception e) { Console.WriteLine(e); }
 		}
 		[TestMethod]
 		public void CoreTest5()
@@ -181,7 +223,7 @@ namespace CoreTest
 			PairTestInterface.gen_chains_all(words, res);
 			res = new List<string>();
 			Console.WriteLine(res.Count);
-			Assert.AreEqual(res.Count, 6);
+			Assert.AreEqual(res.Count, 10);
 			PairTestInterface.gen_chain_word(words, new List<string>() { }, 'g', 'e', true);
 			res = new List<string>();
 			PairTestInterface.gen_chain_word_unique(words, new List<string>() { });

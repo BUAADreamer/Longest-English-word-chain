@@ -84,15 +84,18 @@ namespace CoreTest
 		public void HasImplicitLoopExceptionTest()
 		{
 			string[] args = { "-n", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TestFile6.txt" };
+			int ans = 0;
 			try
 			{
 				CmdTestInterface.testOneSample(args);
 			}
 			catch (HasImplicitLoopException e)
 			{
+				ans = 1;
 				Console.WriteLine(e.Message);
 			}
-
+			Assert.AreEqual(ans, 1);
+			ans = 0;
 			args = new string[] { "-w", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TestFile6.txt" };
 			try
 			{
@@ -100,23 +103,28 @@ namespace CoreTest
 			}
 			catch (HasImplicitLoopException e)
 			{
+				ans = 1;
 				Console.WriteLine(e.Message);
 			}
+			Assert.AreEqual(ans, 1);
 		}
 
 		[TestMethod]
 		public void ResultTooLongExceptionTest()
 		{
 			string[] args = { "-n", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TestFile7.txt" };
+			int ans = 0;
 			try
 			{
 				CmdTestInterface.testOneSample(args);
 			}
 			catch (ResultTooLongException e)
 			{
+				ans = 1;
 				Console.WriteLine(e.Message);
 			}
-
+			Assert.AreEqual(ans, 1);
+			ans = 0;
 			args = new string[] { "-n", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TestFile7.txt" };
 			try
 			{
@@ -124,8 +132,10 @@ namespace CoreTest
 			}
 			catch (ResultTooLongException e)
 			{
+				ans = 1;
 				Console.WriteLine(e.Message);
 			}
+			Assert.AreEqual(ans, 1);
 		}
 
 	}
