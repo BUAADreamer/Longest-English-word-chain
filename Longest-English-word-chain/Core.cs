@@ -203,8 +203,7 @@ namespace Core
 			if (!enableLoop && !dataCheck())
 			{
 				// TODO: 抛出数据有隐含环的异常
-				Console.WriteLine("The words have loop!");
-				return 0;
+				throw new HasImplicitLoopException("");
 			}
 
 			totalCharCount = 0;
@@ -454,8 +453,7 @@ namespace Core
 			if (!enableLoop && !dataCheck())
 			{
 				// TODO：数据有环的异常
-				Console.WriteLine("The words have loop!");
-				return 0;
+				throw new HasImplicitLoopException("");
 			}
 
 			if (!enableLoop)
@@ -474,9 +472,7 @@ namespace Core
 			// 如果需要检查是否有隐含环
 			if (!enableLoop && !dataCheck())
 			{
-				// TODO: 环抛出异常
-				Console.WriteLine("The words have loop!");
-				return 0;
+				throw new HasImplicitLoopException("");
 			}
 			
 			if (!enableLoop)
@@ -524,8 +520,7 @@ namespace Core
 		{
 			if (!dataCheck())
 			{
-				// TODO:抛出单词有隐含环异常
-				return 0;
+				throw new HasImplicitLoopException("");
 			}
 			List<string> curLongestChain = new List<string>();
 			for (int i = 0; i < words.Count; i++)

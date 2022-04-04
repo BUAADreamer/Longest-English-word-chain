@@ -10,7 +10,6 @@ namespace Cmd
         {
             CmdTestInterface.Solve(args);
         }
-        
     }
 }
 
