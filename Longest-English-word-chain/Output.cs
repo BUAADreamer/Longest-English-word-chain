@@ -17,12 +17,15 @@ namespace Library
             {
                 outputStr += wordChains.Count + "\n";
             }
+            if (outputMode == 1 && wordChains.Count < 2)
+            {
+                return outputStr;
+            }
             for (int i = 0; i < wordChains.Count; i++)
             {
                 string wordChain = wordChains[i];
                 outputStr += wordChain + "\n";
             }
-            Console.WriteLine(outputStr);
             return outputStr;
         }
 
@@ -35,7 +38,7 @@ namespace Library
 
         public void writeStrToFile(string outputStr)
         {
-            string filePath = Path.GetFullPath("solution.txt");
+            string filePath = Path.GetFullPath("me.txt");
             StreamWriter sw = new StreamWriter(filePath, false);
             sw.Write(outputStr);
             sw.Flush();
