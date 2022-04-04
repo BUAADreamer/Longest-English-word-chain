@@ -17,19 +17,29 @@ namespace Library
             {
                 outputStr += wordChains.Count + "\n";
             }
+            if (outputMode == 1 && wordChains.Count < 2)
+            {
+                return outputStr;
+            }
             for (int i = 0; i < wordChains.Count; i++)
             {
                 string wordChain = wordChains[i];
                 outputStr += wordChain + "\n";
             }
-            Console.WriteLine(outputStr);
             return outputStr;
         }
 
         public String printWordChains(List<string> wordChains, int outputMode)
         {
             string outputStr = getOutputStr(wordChains, outputMode);
-            writeStrToFile(outputStr);
+            if (outputMode == 0)
+            {
+                Console.WriteLine(outputStr);
+            } 
+            else
+            {
+                writeStrToFile(outputStr);
+            }
             return outputStr;
         }
 
