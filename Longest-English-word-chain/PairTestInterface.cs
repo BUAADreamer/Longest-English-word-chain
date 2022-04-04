@@ -26,7 +26,7 @@ namespace Core
             char head, char tail, bool enable_loop)
         {
             CalcuCore core = new CalcuCore(words, head, tail, enable_loop, 0);
-            core.getMaxAlphabetCountChain(head, tail, enable_loop, result);
+            core.getMaxWordCountChain(head, tail, enable_loop, result);
             try 
             {
                 checkResultLength(result);

@@ -113,12 +113,13 @@ namespace Core
 		private bool dataCheck()
 		{
 			Queue queue = new Queue();
+			Hashtable bufferInDegree = new Hashtable(inDegree);
 			int res = 0;
 
 			// 把入度为 0 的点加入到队列中 
 			for (int i = 0; i < words.Count; i++)
 			{
-				if ((int)inDegree[words[i]] == 0)
+				if ((int)bufferInDegree[words[i]] == 0)
 				{
 					queue.Enqueue(words[i]);
 				}
@@ -132,8 +133,8 @@ namespace Core
 				foreach (DictionaryEntry next in curNext)
 				{
 					string key = (string)next.Key;
-					int degree = (int)inDegree[key];
-					inDegree[key] = degree - 1;
+					int degree = (int)bufferInDegree[key];
+					bufferInDegree[key] = degree - 1;
 					if (degree - 1 == 0)
 					{
 						queue.Enqueue(key);
@@ -213,17 +214,9 @@ namespace Core
 			}
 			return res.Count;
 		}
-		/*
-		public int getMaxWordCountChain(char start, char end, bool enableLoop, List<string> res)
-		{
-			// 如果不允许有环，并且数据中确实有环
-			if (!enableLoop && !dataCheck())
-			{
-				// TODO：数据有环的异常
-				//Console.WriteLine("The words have loop!");
-				return 0;
-			}
 
+		private int trivialGetMaxWordCountChain(char start, char end, List<string> res)
+		{
 			HashSet<string> chainSet = new HashSet<string>();
 			for (int i = 0; i < words.Count; i++)
 			{
@@ -261,17 +254,14 @@ namespace Core
 			}
 			return maxLen;
 		}
-		*/
 
-		public int getMaxAlphabetCountChain(char start, char end, bool enableLoop, List<string> res)
+		private int fastGetMaxAlphabetCountChain(char start, char end, List<string> res)
 		{
-			// 如果需要检查是否有隐含环
-			if (!enableLoop && !dataCheck())
-			{
-				//Console.WriteLine("The words have loop!");
-				return 0;
-			}
-			// 求解满足条件的单词链
+			return fastGetMaxWordCountChain(start, end, res);
+		}
+
+		private int trivialGetMaxAlphabetCountChain(char start, char end, List<string> res)
+		{
 			HashSet<string> chainSet = new HashSet<string>();
 			for (int i = 0; i < words.Count; i++)
 			{
@@ -308,6 +298,125 @@ namespace Core
 				res.Add(str);
 			}
 			return maxLen;
+		}
+		
+		private int fastGetMaxWordCountChain(char start, char end, List<string> res)
+		{
+			Queue queue = new Queue();
+			Hashtable bufferInDegree = new Hashtable(inDegree);
+			Hashtable dp = new Hashtable();
+			Hashtable lastWord = new Hashtable();
+			for (int i = 0; i < words.Count; i++)
+			{
+				dp.Add(words[i], 0);
+			}
+
+			// 把入度为 0 ，且首字母未指定或者指定为 start 的点加入到队列中 
+			for (int i = 0; i < words.Count; i++)
+			{
+				if ((int)bufferInDegree[words[i]] == 0 
+					&& (isInvalidChar(start) || words[i][0] == start))
+				{
+					queue.Enqueue(words[i]);
+					dp[words[i]] = word2len[words[i]];
+				} 
+			}
+
+			while (queue.Count != 0)
+			{
+				string cur = (string)queue.Dequeue();
+				Hashtable curNext = (Hashtable)(graph[cur]);
+
+				foreach (DictionaryEntry next in curNext)
+				{
+					string key = (string)next.Key;
+					int degree = (int)bufferInDegree[key];
+					bufferInDegree[key] = degree - 1;
+					if ((int)dp[key] < (int)dp[cur] + (int)word2len[key])
+					{
+						dp[key] = (int)dp[cur] + (int)word2len[key];
+						if (lastWord.ContainsKey(key))
+						{
+							lastWord[key] = cur;
+ 						}
+						else 
+						{
+							lastWord.Add(key, cur);
+						}
+					}
+					if (degree - 1 == 0)
+					{
+						queue.Enqueue(key);
+					}
+				}
+			}
+
+			int maxLen = 0;
+			string lastChainWord = "";
+			foreach (string str in words)
+			{
+				if ((int)dp[str] > maxLen 
+					&& (str[str.Length - 1] == end || isInvalidChar(end)))
+				{
+					maxLen = (int)dp[str];
+					lastChainWord = str;
+				}
+			}
+			List<string> reversedRes = new List<string>();
+			reversedRes.Add(lastChainWord);
+			while (lastWord.ContainsKey(lastChainWord))
+			{
+				lastChainWord = (string)lastWord[lastChainWord];
+				reversedRes.Add(lastChainWord);
+			}
+			for (int i = reversedRes.Count - 1; i >= 0; i--) 
+			{
+				res.Add(reversedRes[i]);
+			}
+			// TODO: 单个单词的单词链？
+			return maxLen;
+		}
+		
+		public int getMaxWordCountChain(char start, char end, bool enableLoop, List<string> res)
+		{
+			// 如果不允许有环，并且数据中确实有环
+			if (!enableLoop && !dataCheck())
+			{
+				// TODO：数据有环的异常
+				Console.WriteLine("The words have loop!");
+				return 0;
+			}
+
+			if (!enableLoop)
+			{
+				// return trivialGetMaxWordCountChain(start, end, res);
+				return fastGetMaxWordCountChain(start, end, res);
+			}
+			else
+			{
+				return trivialGetMaxWordCountChain(start, end, res);
+			}
+		}
+
+		public int getMaxAlphabetCountChain(char start, char end, bool enableLoop, List<string> res)
+		{
+			// 如果需要检查是否有隐含环
+			if (!enableLoop && !dataCheck())
+			{
+				// TODO: 环抛出异常
+				Console.WriteLine("The words have loop!");
+				return 0;
+			}
+			
+			if (!enableLoop)
+			{
+				// return trivialGetMaxWordCountChain(start, end, res);
+				return fastGetMaxAlphabetCountChain(start, end, res);
+			}
+			else
+			{
+				return trivialGetMaxAlphabetCountChain(start, end, res);
+			}
 		}
 
 		private void getWordChainWithDifferentHead(List<string> currentChain, string currentWord,
