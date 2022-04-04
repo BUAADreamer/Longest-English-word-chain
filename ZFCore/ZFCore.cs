@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime;
-namespace Core
+namespace ZFCore
 {
 	public class CalcuCore
 	{
@@ -14,6 +14,9 @@ namespace Core
         private char end;
         private bool enableLoop;
 		private int graphMode;
+		private int totalCharCount;
+		private int MAXLEN = 20000;
+		private int chainCount;
 
         public CalcuCore(List<string> words, char head, char tail, bool enableLoop, int mode)
         {
@@ -113,12 +116,13 @@ namespace Core
 		private bool dataCheck()
 		{
 			Queue queue = new Queue();
+			Hashtable bufferInDegree = new Hashtable(inDegree);
 			int res = 0;
 
 			// 把入度为 0 的点加入到队列中 
 			for (int i = 0; i < words.Count; i++)
 			{
-				if ((int)inDegree[words[i]] == 0)
+				if ((int)bufferInDegree[words[i]] == 0)
 				{
 					queue.Enqueue(words[i]);
 				}
@@ -132,8 +136,8 @@ namespace Core
 				foreach (DictionaryEntry next in curNext)
 				{
 					string key = (string)next.Key;
-					int degree = (int)inDegree[key];
-					inDegree[key] = degree - 1;
+					int degree = (int)bufferInDegree[key];
+					bufferInDegree[key] = degree - 1;
 					if (degree - 1 == 0)
 					{
 						queue.Enqueue(key);
@@ -154,19 +158,26 @@ namespace Core
 		{
 			currentChain.Add(currentWord);
 			usedWords.Add(currentWord);
-			if (currentChain.Count > 1
+			
+			if (currentChain.Count > 1 
 				&& (currentWord[currentWord.Length - 1] == end || isInvalidChar(end)))
 			{
-				string currentChainString = "";
-				for (int i = 0; i < currentChain.Count; i++)
+				chainCount++;
+				// 如果字符数没有超过限制，则保存字符串，否则只增加计数器，减少内存消耗
+				if (totalCharCount < MAXLEN)
 				{
-					currentChainString += currentChain[i];
-					if (i != currentChain.Count - 1)
+					string currentChainString = "";
+					for (int i = 0; i < currentChain.Count; i++)
 					{
-						currentChainString += " ";
+						currentChainString += currentChain[i];
+						if (i != currentChain.Count - 1)
+						{
+							currentChainString += " ";
+						}
 					}
+					res.Add(currentChainString);
+					totalCharCount += currentChain.Count;
 				}
-				res.Add(currentChainString);
 			}
 
 			// 选择下一个单词
@@ -187,14 +198,15 @@ namespace Core
 
 		public int getAllWordChains(char start, char end, bool enableLoop, List<string> res)
 		{
+			chainCount = 0;
 			// 如果不允许有隐含环且确实含有隐含环
 			if (!enableLoop && !dataCheck())
 			{
 				// TODO: 抛出数据有隐含环的异常
-				//Console.WriteLine("The words have loop!");
-				return 0;
+				throw new HasImplicitLoopException("");
 			}
 
+			totalCharCount = 0;
 			// 求解单词链
 			HashSet<string> chainSet = new HashSet<string>();
 			for (int i = 0; i < words.Count; i++)
@@ -211,182 +223,325 @@ namespace Core
 			{
 				res.Add(str);
 			}
-			return res.Count;
+			return chainCount;
 		}
-		/*
+
+		private void getOneMaxAlphabetCountChain(int charCount, List<string> curLongestChain, 
+			List<string> curChain, string word, char start, char end, HashSet<string> usedWords)
+		{
+			curChain.Add(word);
+			usedWords.Add(word);
+			
+			int newCharCount = charCount + word.Length;
+			Hashtable next = (Hashtable)graph[word];
+			foreach (DictionaryEntry de in next)
+			{
+				string nextWord = (string)de.Key;
+				if (!usedWords.Contains(nextWord))
+				{
+					getOneMaxAlphabetCountChain(newCharCount, curLongestChain, curChain, nextWord, start, end, usedWords);
+				}
+			}
+
+			// 满足尾字母约束，且长度更长，且单词数大于1的才是答案
+			if (end == word[word.Length - 1] || isInvalidChar(end))
+			{
+				int oldCharCount = 0;
+				for (int i = 0; i < curLongestChain.Count; i++)
+				{
+					oldCharCount += curLongestChain[i].Length;
+				}
+				if (newCharCount > oldCharCount && curChain.Count > 1)
+				{
+					curLongestChain.Clear();
+					for (int i = 0; i < curChain.Count; i++)
+					{
+						curLongestChain.Add(curChain[i]);
+					}
+				}
+			}
+
+			curChain.RemoveAt(curChain.Count - 1);
+			usedWords.Remove(word);
+		}
+
+		private void getOneMaxWordCountChain(List<string> curLongestChain, List<string> curChain, 
+			string word, char start, char end, HashSet<string> usedWords)
+		{
+			curChain.Add(word);
+			usedWords.Add(word);
+			
+			Hashtable next = (Hashtable)graph[word];
+			foreach (DictionaryEntry de in next)
+			{
+				string nextWord = (string)de.Key;
+				if (!usedWords.Contains(nextWord))
+				{
+					getOneMaxWordCountChain(curLongestChain, curChain, nextWord, start, end, usedWords);
+				}
+			}
+
+			// 满足尾字母约束，且长度更长，且单词数大于1的才是答案
+			if (end == word[word.Length - 1] || isInvalidChar(end))
+			{
+				if (curChain.Count > curLongestChain.Count && curChain.Count > 1)
+				{
+					curLongestChain.Clear();
+					for (int i = 0; i < curChain.Count; i++)
+					{
+						curLongestChain.Add(curChain[i]);
+					}
+				}
+			}
+
+			curChain.RemoveAt(curChain.Count - 1);
+			usedWords.Remove(word);
+		}
+
+		private int trivialGetMaxWordCountChain(char start, char end, List<string> res)
+		{
+			List<string> curLongestChain = new List<string>();
+			for (int i = 0; i < words.Count; i++)
+			{
+				string word = words[i];
+				if (word[0] == start || isInvalidChar(start))
+				{
+					List<string> curChain = new List<string>();
+					HashSet<string> usedWords = new HashSet<string>();
+					getOneMaxWordCountChain(curLongestChain, curChain, word, start, end, usedWords);
+				}
+			}
+
+			// 最终单词超过1个才能返回出去
+			if (curLongestChain.Count > 1)
+			{
+				for (int i = 0; i < curLongestChain.Count; i++)
+				{
+					res.Add(curLongestChain[i]);
+				}
+				return res.Count;
+			}
+			else
+			{
+				return 0;
+			}
+		}
+
+		private int fastGetMaxAlphabetCountChain(char start, char end, List<string> res)
+		{
+			return fastGetMaxWordCountChain(start, end, res);
+		}
+
+		private int trivialGetMaxAlphabetCountChain(char start, char end, List<string> res)
+		{
+			List<string> curLongestChain = new List<string>();
+			int curCharCount = 0;
+			for (int i = 0; i < words.Count; i++)
+			{
+				string word = words[i];
+				if (word[0] == start || isInvalidChar(start))
+				{
+					List<string> curChain = new List<string>();
+					HashSet<string> usedWords = new HashSet<string>();
+					getOneMaxAlphabetCountChain(0, curLongestChain, curChain, word, start, end, usedWords);
+					int newCount = 0;
+					for (int j = 0; j < curLongestChain.Count; j++)
+					{
+						newCount += curLongestChain[j].Length;
+					}
+					if (newCount > curCharCount)
+					{
+						curCharCount = newCount;
+					}
+				}
+			}
+
+			if (curLongestChain.Count > 1)
+			{
+				for (int i = 0; i < curLongestChain.Count; i++)
+				{
+					res.Add(curLongestChain[i]);
+				}
+				return curCharCount;
+			}
+			else
+			{
+				return 0;
+			}
+		}
+		
+		private int fastGetMaxWordCountChain(char start, char end, List<string> res)
+		{
+			Queue queue = new Queue();
+			Hashtable bufferInDegree = new Hashtable(inDegree);
+			Hashtable dp = new Hashtable();
+			Hashtable lastWord = new Hashtable();
+			for (int i = 0; i < words.Count; i++)
+			{
+				dp.Add(words[i], 0);
+			}
+
+			// 把入度为 0 ，且首字母未指定或者指定为 start 的点加入到队列中 
+			for (int i = 0; i < words.Count; i++)
+			{
+				if ((int)bufferInDegree[words[i]] == 0 
+					&& (isInvalidChar(start) || words[i][0] == start))
+				{
+					queue.Enqueue(words[i]);
+					dp[words[i]] = word2len[words[i]];
+				} 
+			}
+
+			while (queue.Count != 0)
+			{
+				string cur = (string)queue.Dequeue();
+				Hashtable curNext = (Hashtable)(graph[cur]);
+
+				foreach (DictionaryEntry next in curNext)
+				{
+					string key = (string)next.Key;
+					int degree = (int)bufferInDegree[key];
+					bufferInDegree[key] = degree - 1;
+					if ((int)dp[key] < (int)dp[cur] + (int)word2len[key])
+					{
+						dp[key] = (int)dp[cur] + (int)word2len[key];
+						if (lastWord.ContainsKey(key))
+						{
+							lastWord[key] = cur;
+ 						}
+						else 
+						{
+							lastWord.Add(key, cur);
+						}
+					}
+					if (degree - 1 == 0)
+					{
+						queue.Enqueue(key);
+					}
+				}
+			}
+
+			int maxLen = 0;
+			string lastChainWord = "";
+			foreach (string str in words)
+			{
+				if ((int)dp[str] > maxLen 
+					&& (str[str.Length - 1] == end || isInvalidChar(end)))
+				{
+					maxLen = (int)dp[str];
+					lastChainWord = str;
+				}
+			}
+			List<string> reversedRes = new List<string>();
+			reversedRes.Add(lastChainWord);
+			while (lastWord.ContainsKey(lastChainWord))
+			{
+				lastChainWord = (string)lastWord[lastChainWord];
+				reversedRes.Add(lastChainWord);
+			}
+			for (int i = reversedRes.Count - 1; i >= 0; i--) 
+			{
+				res.Add(reversedRes[i]);
+			}
+			// TODO: 单个单词的单词链？
+			return maxLen;
+		}
+		
 		public int getMaxWordCountChain(char start, char end, bool enableLoop, List<string> res)
 		{
 			// 如果不允许有环，并且数据中确实有环
 			if (!enableLoop && !dataCheck())
 			{
 				// TODO：数据有环的异常
-				//Console.WriteLine("The words have loop!");
-				return 0;
+				throw new HasImplicitLoopException("");
 			}
 
-			HashSet<string> chainSet = new HashSet<string>();
-			for (int i = 0; i < words.Count; i++)
+			if (!enableLoop)
 			{
-				string word = words[i];
-				if (word[0] == start || isInvalidChar(start))
-				{
-					List<string> chain = new List<string>();
-					HashSet<string> usedWords = new HashSet<string>();
-					getWordChain(chain, word, start, end, chainSet, usedWords);
-				}
+				// return trivialGetMaxWordCountChain(start, end, res);
+				return fastGetMaxWordCountChain(start, end, res);
 			}
-			int maxLen = 0;
-			string longestChain = "";
-			foreach (string chain in chainSet)
+			else
 			{
-				int len = 0;
-				for (int i = 0; i < chain.Length; i++)
-				{
-					if (isInvalidChar(chain[i]))
-					{
-						len++;
-					}
-				}
-				if (maxLen < len)
-				{
-					maxLen = len;
-					longestChain = chain;
-				}
+				return trivialGetMaxWordCountChain(start, end, res);
 			}
-			// 把单个单词链的空格改成换行
-			string[] substrings = longestChain.Split(' ');
-			foreach (string str in substrings)
-			{
-				res.Add(str);
-			}
-			return maxLen;
 		}
-		*/
 
 		public int getMaxAlphabetCountChain(char start, char end, bool enableLoop, List<string> res)
 		{
 			// 如果需要检查是否有隐含环
 			if (!enableLoop && !dataCheck())
 			{
-				//Console.WriteLine("The words have loop!");
-				return 0;
+				throw new HasImplicitLoopException("");
 			}
-			// 求解满足条件的单词链
-			HashSet<string> chainSet = new HashSet<string>();
-			for (int i = 0; i < words.Count; i++)
+			
+			if (!enableLoop)
 			{
-				string word = words[i];
-				if (word[0] == start || isInvalidChar(start))
-				{
-					List<string> chain = new List<string>();
-					HashSet<string> usedWords = new HashSet<string>();
-					getWordChain(chain, word, start, end, chainSet, usedWords);
-				}
+				// return trivialGetMaxWordCountChain(start, end, res);
+				return fastGetMaxAlphabetCountChain(start, end, res);
 			}
-			int maxLen = 0;
-			string longestChain = "";
-			foreach (string chain in chainSet)
+			else
 			{
-				int len = 0;
-				for (int i = 0; i < chain.Length; i++)
-				{
-					if (!isInvalidChar(chain[i]))
-					{
-						len++;
-					}
-				}
-				if (maxLen < len)
-				{
-					maxLen = len;
-					longestChain = chain;
-				}
+				return trivialGetMaxAlphabetCountChain(start, end, res);
 			}
-			// 把单个单词链的空格改成换行
-			string[] substrings = longestChain.Split(' ');
-			foreach (string str in substrings)
-			{
-				res.Add(str);
-			}
-			return maxLen;
 		}
 
-		private void getWordChainWithDifferentHead(List<string> currentChain, string currentWord,
-			HashSet<string> res, HashSet<char> charSet)
+		private void getWordChainWithDifferentHead(List<string> curChain, 
+			List<string> curLongestChain, string word, HashSet<char> charSet)
 		{
-			currentChain.Add(currentWord);
-			charSet.Add(currentWord[0]);
-			if (currentChain.Count > 1)
-			{
-				string currentChainString = "";
-				for (int i = 0; i < currentChain.Count; i++)
-				{
-					currentChainString += currentChain[i];
-					if (i != currentChain.Count - 1)
-					{
-						currentChainString += " ";
-					}
-				}
-				res.Add(currentChainString);
-			}
-
-			// 选择下一个单词
-			Hashtable next = (Hashtable)graph[currentWord];
+			curChain.Add(word);
+			charSet.Add(word[0]);
+			
+			Hashtable next = (Hashtable)graph[word];
 			foreach (DictionaryEntry de in next)
 			{
 				string nextWord = (string)de.Key;
-				// 不能有相同头的字符
-				if (charSet.Contains(nextWord[0]))
+				if (!charSet.Contains(nextWord[0]))
 				{
-					continue;
+					getWordChainWithDifferentHead(curChain, curLongestChain, nextWord, charSet);
 				}
-				getWordChainWithDifferentHead(currentChain, nextWord, res, charSet);
 			}
 
-			// 回溯删除当前单词
-			currentChain.RemoveAt(currentChain.Count - 1);
-			charSet.Remove(currentWord[0]);
+			// 满足单词数大于1的才是答案
+			if (curChain.Count > curLongestChain.Count && curChain.Count > 1)
+			{
+				curLongestChain.Clear();
+				for (int i = 0; i < curChain.Count; i++)
+				{
+					curLongestChain.Add(curChain[i]);
+				}
+			}
+
+			curChain.RemoveAt(curChain.Count - 1);
+			charSet.Remove(word[0]);
 		}
 
 		public int getMaxWordCountChainWithDifferentHead(List<string> res)
 		{
 			if (!dataCheck())
 			{
-				// TODO:抛出单词有隐含环异常
-				return 0;
+				throw new HasImplicitLoopException("");
 			}
-			HashSet<string> chainSet = new HashSet<string>();
+			List<string> curLongestChain = new List<string>();
 			for (int i = 0; i < words.Count; i++)
 			{
 				HashSet<char> charSet = new HashSet<char>();
 				string word = words[i];
 				List<string> chain = new List<string>();
-				getWordChainWithDifferentHead(chain, word, chainSet, charSet);
+				getWordChainWithDifferentHead(chain, curLongestChain, word, charSet);
 			}
-			int maxLen = 0;
-			string longestChain = "";
-			foreach (string chain in chainSet)
+			if (curLongestChain.Count > 1)
 			{
-				int len = 0;
-				for (int i = 0; i < chain.Length; i++)
+				for (int i = 0; i < curLongestChain.Count; i++)
 				{
-					// 统计个数
-					if (isInvalidChar(chain[i]))
-					{
-						len++;
-					}
+					res.Add(curLongestChain[i]);
 				}
-				if (maxLen < len)
-				{
-					maxLen = len;
-					longestChain = chain;
-				}
+				return res.Count;
 			}
-			string[] substrings = longestChain.Split(' ');
-			foreach (string str in substrings)
+			else
 			{
-				res.Add(str);
+				return 0;
 			}
-			return maxLen;
 		}
 	}
 }
