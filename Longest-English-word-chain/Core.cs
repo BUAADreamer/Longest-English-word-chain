@@ -490,41 +490,34 @@ namespace Core
 			}
 		}
 
-		private void getWordChainWithDifferentHead(List<string> currentChain, string currentWord,
-			HashSet<string> res, HashSet<char> charSet)
+		private void getWordChainWithDifferentHead(List<string> curChain, 
+			List<string> curLongestChain, string word, HashSet<char> charSet)
 		{
-			currentChain.Add(currentWord);
-			charSet.Add(currentWord[0]);
-			if (currentChain.Count > 1)
-			{
-				string currentChainString = "";
-				for (int i = 0; i < currentChain.Count; i++)
-				{
-					currentChainString += currentChain[i];
-					if (i != currentChain.Count - 1)
-					{
-						currentChainString += " ";
-					}
-				}
-				res.Add(currentChainString);
-			}
-
-			// 选择下一个单词
-			Hashtable next = (Hashtable)graph[currentWord];
+			curChain.Add(word);
+			charSet.Add(word[0]);
+			
+			Hashtable next = (Hashtable)graph[word];
 			foreach (DictionaryEntry de in next)
 			{
 				string nextWord = (string)de.Key;
-				// 不能有相同头的字符
-				if (charSet.Contains(nextWord[0]))
+				if (!charSet.Contains(nextWord[0]))
 				{
-					continue;
+					getWordChainWithDifferentHead(curChain, curLongestChain, nextWord, charSet);
 				}
-				getWordChainWithDifferentHead(currentChain, nextWord, res, charSet);
 			}
 
-			// 回溯删除当前单词
-			currentChain.RemoveAt(currentChain.Count - 1);
-			charSet.Remove(currentWord[0]);
+			// 满足单词数大于1的才是答案
+			if (curChain.Count > curLongestChain.Count && curChain.Count > 1)
+			{
+				curLongestChain.Clear();
+				for (int i = 0; i < curChain.Count; i++)
+				{
+					curLongestChain.Add(curChain[i]);
+				}
+			}
+
+			curChain.RemoveAt(curChain.Count - 1);
+			charSet.Remove(word[0]);
 		}
 
 		public int getMaxWordCountChainWithDifferentHead(List<string> res)
@@ -534,39 +527,26 @@ namespace Core
 				// TODO:抛出单词有隐含环异常
 				return 0;
 			}
-			HashSet<string> chainSet = new HashSet<string>();
+			List<string> curLongestChain = new List<string>();
 			for (int i = 0; i < words.Count; i++)
 			{
 				HashSet<char> charSet = new HashSet<char>();
 				string word = words[i];
 				List<string> chain = new List<string>();
-				getWordChainWithDifferentHead(chain, word, chainSet, charSet);
+				getWordChainWithDifferentHead(chain, curLongestChain, word, charSet);
 			}
-			int maxLen = 0;
-			string longestChain = "";
-			foreach (string chain in chainSet)
+			if (curLongestChain.Count > 1)
 			{
-				int len = 0;
-				for (int i = 0; i < chain.Length; i++)
+				for (int i = 0; i < curLongestChain.Count; i++)
 				{
-					// 统计个数
-					if (isInvalidChar(chain[i]))
-					{
-						len++;
-					}
+					res.Add(curLongestChain[i]);
 				}
-				if (maxLen < len)
-				{
-					maxLen = len;
-					longestChain = chain;
-				}
+				return res.Count;
 			}
-			string[] substrings = longestChain.Split(' ');
-			foreach (string str in substrings)
+			else
 			{
-				res.Add(str);
+				return 0;
 			}
-			return maxLen;
 		}
 	}
 }
