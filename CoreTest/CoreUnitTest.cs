@@ -173,6 +173,24 @@ namespace CoreTest
 			PairTestInterface.gen_chain_char(words, new List<string>(), 'i', 'e', true);
 			PairTestInterface.gen_chain_char(words, new List<string>(), 'h', 't', false);
 		}
+		[TestMethod]
+		public void CoreTest5()
+		{
+			List<string> words = new List<string>() { "gbps", "generate", "google", "growing", "handle", "handling", "hardware", "has"};
+			List<string> res = new List<string>();
+			PairTestInterface.gen_chains_all(words, res);
+			res = new List<string>();
+			Console.WriteLine(res.Count);
+			Assert.AreEqual(res.Count, 6);
+			PairTestInterface.gen_chain_word(words, new List<string>() { }, 'g', 'e', true);
+			res = new List<string>();
+			PairTestInterface.gen_chain_word_unique(words, new List<string>() { });
+			res = new List<string>();
+			PairTestInterface.gen_chain_char(words, new List<string>(), 'i', 'e', true);
+			res = new List<string>();
+			PairTestInterface.gen_chain_char(words, new List<string>(), 'h', 't', false);
+			res = new List<string>();
+		}
 
 		public Hashtable getValidCharPair()
 		{
