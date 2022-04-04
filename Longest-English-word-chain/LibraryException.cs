@@ -14,4 +14,11 @@ namespace Library
 		{
 		}
 	}
+
+	public class FileInvalidException : Exception
+	{
+		public FileInvalidException(string message) : base("FileInvalidException:" + message)
+		{
+		}
+	}
 }
