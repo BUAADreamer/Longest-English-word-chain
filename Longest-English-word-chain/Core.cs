@@ -456,7 +456,7 @@ namespace Core
 				throw new HasImplicitLoopException("");
 			}
 
-			if (!enableLoop)
+			if (!enableLoop && isInvalidChar(start))
 			{
 				// return trivialGetMaxWordCountChain(start, end, res);
 				return fastGetMaxWordCountChain(start, end, res);
@@ -475,7 +475,7 @@ namespace Core
 				throw new HasImplicitLoopException("");
 			}
 			
-			if (!enableLoop)
+			if (!enableLoop && isInvalidChar(start))
 			{
 				// return trivialGetMaxWordCountChain(start, end, res);
 				return fastGetMaxAlphabetCountChain(start, end, res);
