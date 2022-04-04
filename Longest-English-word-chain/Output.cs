@@ -32,13 +32,20 @@ namespace Library
         public String printWordChains(List<string> wordChains, int outputMode)
         {
             string outputStr = getOutputStr(wordChains, outputMode);
-            writeStrToFile(outputStr);
+            if (outputMode == 0)
+            {
+                Console.WriteLine(outputStr);
+            } 
+            else
+            {
+                writeStrToFile(outputStr);
+            }
             return outputStr;
         }
 
         public void writeStrToFile(string outputStr)
         {
-            string filePath = Path.GetFullPath("me.txt");
+            string filePath = Path.GetFullPath("solution.txt");
             StreamWriter sw = new StreamWriter(filePath, false);
             sw.Write(outputStr);
             sw.Flush();
