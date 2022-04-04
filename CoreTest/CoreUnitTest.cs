@@ -6,6 +6,7 @@ using System.Collections;
 using Library;
 using System.Collections.Generic;
 using Cmd;
+using HYCore;
 
 namespace CoreTest
 {
@@ -32,18 +33,25 @@ namespace CoreTest
 		{
 			String[] args = { "-n", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TestFile1.txt" };
 			TestOneSample(args);
+			Console.WriteLine("point 1 pass");
 			String[] args1 = { "-w", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TestFile2.txt" };
 			TestOneSample(args1);
+			Console.WriteLine("point 2 pass");
 			String[] args2 = { "-m", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TestFile2.txt" };
 			TestOneSample(args2);
+			Console.WriteLine("point 3 pass");
 			String[] args3 = { "-c", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TestFile2.txt" };
 			TestOneSample(args3);
+			Console.WriteLine("point 4 pass");
 			String[] args4 = { "-h","e","-w", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TestFile2.txt" };
 			TestOneSample(args4);
+			Console.WriteLine("point 5 pass");
 			String[] args5 = { "-t", "t", "-w", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TestFile2.txt" };
 			TestOneSample(args5);
+			Console.WriteLine("point 6 pass");
 			String[] args6 = { "-r","-w", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TestFile3.txt" };
 			TestOneSample(args6);
+			Console.WriteLine("point 7 pass");
 			//Program.Main(args1);
 		}
 		[TestMethod]
@@ -221,17 +229,23 @@ namespace CoreTest
 			List<string> words = new List<string>() { "gbps", "generate", "google", "growing", "handle", "handling", "hardware", "has"};
 			List<string> res = new List<string>();
 			PairTestInterface.gen_chains_all(words, res);
-			res = new List<string>();
-			Console.WriteLine(res.Count);
 			Assert.AreEqual(res.Count, 10);
-			PairTestInterface.gen_chain_word(words, new List<string>() { }, 'g', 'e', true);
+
 			res = new List<string>();
-			PairTestInterface.gen_chain_word_unique(words, new List<string>() { });
+			PairTestInterface.gen_chain_word(words, res, 'g', 'e', true);
+			Assert.AreEqual(res.Count, 2);
+
 			res = new List<string>();
-			PairTestInterface.gen_chain_char(words, new List<string>(), 'i', 'e', true);
+			PairTestInterface.gen_chain_word_unique(words, res);
+			Assert.AreEqual(res.Count, 2);
+
 			res = new List<string>();
-			PairTestInterface.gen_chain_char(words, new List<string>(), 'h', 't', false);
+			PairTestInterface.gen_chain_char(words, res, 'i', 'e', true);
+			Assert.AreEqual(res.Count, 0);
+
 			res = new List<string>();
+			PairTestInterface.gen_chain_char(words, res, 'h', 't', false);
+			Assert.AreEqual(res.Count, 0);
 		}
 
 		public Hashtable getValidCharPair()
@@ -253,7 +267,78 @@ namespace CoreTest
 
 		public void TestOneSample(String[] args)
         {
-			CmdTestInterface.Solve(args);
+			List<string> res;
+			List<string> res1;
+			int a = 0;
+			try 
+			{ 
+				res = CmdTestInterface.testOneSample(args);
+			}
+			catch(Exception e)
+            {
+				a = 1;
+                try
+                {
+					res1 = TestOneSampleByOther(args);
+				}
+				catch(Exception e1)
+                {
+					a = 2;
+                }
+				Assert.AreEqual(2, a);
+				return;
+            }
+			try
+			{
+				res1 = TestOneSampleByOther(args);
+				Assert.AreEqual(res.Count, res1.Count);
+			}
+			catch (Exception e)
+			{
+				a = 1;
+				printArgs(args);
+				Assert.AreEqual(2, a);
+			}
 		}
+
+		public List<string> TestOneSampleByOther(string[] args)
+        {
+			CommandParser parser = new CommandParser(args);
+			ParseRes parseRes = parser.getParseRes();
+			WordListMaker maker = new WordListMaker();
+			string article = maker.getArticleByPath(parseRes.absolutePathOfWordList);
+			List<string> wordList = maker.makeWordList(article);
+			List<string> result = new List<string>();
+			int outputMode = 1;
+			if (parseRes.cmdChars.Contains('n'))
+			{
+				Chain.gen_chains_all(wordList, 0,result);
+				if(result.Count>0)
+					result.RemoveAt(0);
+			}
+			else if (parseRes.cmdChars.Contains('w'))
+			{
+				Chain.gen_chain_word(wordList, 0, result, parseRes.start, parseRes.end, parseRes.enableLoop);
+			}
+			else if (parseRes.cmdChars.Contains('m'))
+			{
+				Chain.gen_chain_word_unique(wordList, 0, result);
+			}
+			else
+			{
+				Chain.gen_chain_char(wordList, 0, result, parseRes.start, parseRes.end, parseRes.enableLoop);
+			}
+			Output output = new Output();
+			output.printWordChains(result, outputMode);
+			return result;
+		}
+
+		public void printArgs(string[] args)
+        {
+			foreach(string s in args)
+            {
+				Console.WriteLine(s);
+            }
+        }
 	}
 }

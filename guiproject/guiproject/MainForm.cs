@@ -94,12 +94,12 @@ namespace guiproject
         {
             //CoreType:0 使用我们的Core
             //CoreType:1 使用交换的Core
-            int CoreType = 1;
+            int CoreType = 0;
             if (CoreType == 0)
             {
                 try
                 {
-                    string[] args = textBox3.Text.Split(" ");
+                    string[] args = System.Text.RegularExpressions.Regex.Split(textBox3.Text, @"\s+");
                     CommandParser parser = new CommandParser(args);
                     ParseRes parseRes = parser.getParseRes();
                     WordListMaker maker = new WordListMaker();
@@ -137,7 +137,7 @@ namespace guiproject
             {
                 try
                 {
-                    string[] args = textBox3.Text.Split(" ");
+                    string[] args = System.Text.RegularExpressions.Regex.Split(textBox3.Text, @"\s+");
                     CommandParser parser = new CommandParser(args);
                     ParseRes parseRes = parser.getParseRes();
                     WordListMaker maker = new WordListMaker();

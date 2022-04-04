@@ -14,7 +14,7 @@ namespace Cmd
         {
             try
             {
-                string res = testOneSample(args);
+                List<string> res = testOneSample(args);
             }
             catch (Exception e)
             {
@@ -23,7 +23,7 @@ namespace Cmd
             return "";
         }
 
-        public static string testOneSample(string[] args)
+        public static List<string> testOneSample(string[] args)
         {
             CommandParser parser = new CommandParser(args);
             ParseRes parseRes = parser.getParseRes();
@@ -50,9 +50,9 @@ namespace Cmd
                 PairTestInterface.gen_chain_char(wordList, result, parseRes.start, parseRes.end, parseRes.enableLoop);
             }
             Output output = new Output();
-            return output.printWordChains(result, outputMode);
+            output.printWordChains(result, outputMode);
+            return result;
         }
-
     }
 }
 

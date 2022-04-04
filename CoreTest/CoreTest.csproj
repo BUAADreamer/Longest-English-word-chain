@@ -17,4 +17,10 @@
     <ProjectReference Include="..\Longest-English-word-chain\Longest-English-word-chain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="HYCore">
+      <HintPath>..\Longest-English-word-chain\HYCore.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
