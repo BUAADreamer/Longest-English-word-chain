@@ -9,3 +9,8 @@ del ..\cmdproject\cmdproject\Library.dll
 del ..\cmdproject\cmdproject\HYCore.dll
 xcopy .\*.dll ..\guiproject\guiproject\
 xcopy .\*.dll ..\cmdproject\cmdproject\
+del ..\bin\*.dll
+del ..\bin\*.exe
+xcopy .\Library.dll ..\bin\
+xcopy .\Core.dll ..\bin\
+xcopy .\WordList.exe ..\bin\

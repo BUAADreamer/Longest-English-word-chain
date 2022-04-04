@@ -14,6 +14,10 @@ namespace Library
         public string getArticleByPath(string path)
         {
             string res = "";
+            if (!path.EndsWith(".txt"))
+            {
+                throw new FileInvalidException("file must be end with .txt!!");
+            }
             try
             {
                 StreamReader reader = new StreamReader(path);
@@ -26,7 +30,7 @@ namespace Library
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                throw new FileInvalidException("[" + path + "]" + " is invalid!!");
             }
             return res;
         }
@@ -96,6 +100,11 @@ namespace Library
             init();
             parseCommand(args);
             parseRes = new ParseRes(mode, enableLoop, start, end, absolutePathOfWordList, cmdChars);
+        }
+
+        public CommandParser()
+        {
+            init();
         }
 
         private void init()
@@ -189,25 +198,26 @@ namespace Library
         public void parseCommand(string[] args)
         {
             int pos = 0;
+            bool hasMainCmdChar = false;
             while (pos < args.Length)
             {
                 if (args[pos].Length >= 1 && args[pos][0] == '-')
                 {
                     if (args[pos].Length != 2 || !validCmdChars.Contains(args[pos][1]))
                     {
-                        throw new CommandInvalidException("invalid arg at pos " + pos);
+                        throw new CommandInvalidException("invalid arg at pos " + pos + ", should be like: -n");
                     }
                     char c = args[pos][1];
                     if (char2ap.ContainsKey(c))
                     {
-                        throw new CommandComplexException(string.Format("{0} and {1}", c, c));
+                        throw new CommandComplexException(string.Format("{0} and {1} command is complex!!", c, c));
                     }
                     char2ap.Add(c, 1);
                     if (c == 'h' || c == 't')
                     {
                         if (pos + 1 >= args.Length || args[pos + 1].Length != 1 || !Char.IsLetter(args[pos + 1][0]))
                         {
-                            throw new CommandInvalidException("invalid arg behind cmd " + c + " at pos " + pos);
+                            throw new CommandInvalidException("invalid arg behind cmd " + c + " at pos " + pos + ", need to add a lower letter");
                         }
                         char beginOrEnd = Char.ToLower(args[pos + 1][0]);
                         if (c == 'h')
@@ -226,10 +236,12 @@ namespace Library
                     }
                     if (c == 'w' || c == 'm' || c == 'c')
                     {
+                        hasMainCmdChar = true;
                         mode = 0;
                     }
                     else
                     {
+                        hasMainCmdChar = true;
                         mode = 1;
                     }
                     pos += 1;
@@ -238,11 +250,15 @@ namespace Library
                 {
                     if (pos != args.Length - 1)
                     {
-                        throw new CommandInvalidException("invalid arg at pos " + pos);
+                        throw new CommandInvalidException("invalid arg at pos " + pos + ",file path should be at the end!!");
                     }
                     absolutePathOfWordList = args[pos];
                     pos += 1;
                 }
+            }
+            if (!hasMainCmdChar)
+            {
+                throw new CommandInvalidException("lack main cmd char : n/w/m/c");
             }
             foreach (char c1 in char2ap.Keys)
             {
@@ -251,14 +267,10 @@ namespace Library
                 {
                     if ((bool)((Hashtable)validCharPair[c1])[c2] == false && c1 != c2)
                     {
-                        throw new CommandComplexException(string.Format("{0} and {1}", c1, c2));
+                        throw new CommandComplexException(string.Format("{0} and {1} command is conflict!!!", c1, c2));
                     }
                 }
             }
-        }
-        static public string[] ArgsMaker(string cmd)
-        {
-            return cmd.Split(' ');
         }
 
         public ParseRes getParseRes()
