@@ -6,4 +6,10 @@
 		<RootNamespace>Longest_English_word_chain</RootNamespace>
 	</PropertyGroup>
 
+	<ItemGroup>
+	  <Reference Include="HYCore">
+	    <HintPath>..\guiproject\guiproject\HYCore.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+
 </Project>

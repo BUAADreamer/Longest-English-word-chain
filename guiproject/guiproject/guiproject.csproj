@@ -10,6 +10,9 @@
     <Reference Include="Core">
       <HintPath>Core.dll</HintPath>
     </Reference>
+    <Reference Include="HYCore">
+      <HintPath>HYCore.dll</HintPath>
+    </Reference>
     <Reference Include="Library">
       <HintPath>Library.dll</HintPath>
     </Reference>

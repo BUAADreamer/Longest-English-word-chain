@@ -2,8 +2,6 @@
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
-using Library;
-using Core;
 namespace Cmd 
 {
     class Program
@@ -19,7 +17,7 @@ namespace Cmd
             }
             else
             {
-
+                CmdTestInterface.SolveByHy(args, "");
             }
         }
         
