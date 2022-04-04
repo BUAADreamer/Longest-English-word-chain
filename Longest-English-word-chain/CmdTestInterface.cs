@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Core;
 using Library;
-using HYCore;
 namespace Cmd
 {
 	public class CmdTestInterface
