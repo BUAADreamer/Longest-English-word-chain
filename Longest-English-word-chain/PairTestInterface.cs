@@ -39,18 +39,15 @@ namespace Core
         public static int gen_chains_all(List<string> words, List<string> result)
         {
             CalcuCore core = new CalcuCore(words, '0', '0', false, 0);
-            core.getAllWordChains('0', '0', false, result);
-            try 
-            {
-                checkResultLength(result);
-            }
-            catch (ResultTooLongException e)
+            int ansLen = core.getAllWordChains('0', '0', false, result);
+            const int MAXLEN = 20000;
+            if (ansLen > MAXLEN)
             {
                 result.Clear();
-                Console.WriteLine(e.Message);
-                throw new ResultTooLongException(e.Message);
-            }
-            return result.Count;
+                Console.WriteLine(ansLen);
+                throw new ResultTooLongException("");
+            } 
+            return ansLen;
         }
 
         public static int gen_chain_word_unique(List<string> words, List<string> result)
