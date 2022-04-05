@@ -10,12 +10,8 @@ namespace Core
         }
         private static void checkResultLength(List<string> result)
         {
-            int len = 0;
+            int len = result.Count;
             const int MAXLEN = 20000;
-            foreach (string str in result)
-            {
-                len += str.Length;
-            }
             if (len > MAXLEN)
             {
                 throw new ResultTooLongException("The result length is " + len);
