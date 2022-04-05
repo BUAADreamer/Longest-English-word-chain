@@ -52,6 +52,12 @@ namespace CoreTest
 			String[] args6 = { "-r","-w", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TestFile3.txt" };
 			TestOneSample(args6);
 			Console.WriteLine("point 7 pass");
+			String[] args7 = { "-w", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TestFile8.txt" };
+			TestOneSample(args7);
+			Console.WriteLine("point 8 pass");
+			CmdTestInterface.Solve(args);
+			String[] args8 = { "-n", "C:/Users/fzc/source/repos/Longest-English-word-chain/Longest-English-word-chain/TestFile6.txt" };
+			CmdTestInterface.Solve(args8);
 			//Program.Main(args1);
 		}
 		[TestMethod]
@@ -245,7 +251,7 @@ namespace CoreTest
 
 			res = new List<string>();
 			PairTestInterface.gen_chain_char(words, res, 'h', 't', false);
-			Assert.AreEqual(res.Count, 0);
+			Assert.AreEqual(res.Count, 1);
 		}
 
 		public Hashtable getValidCharPair()
@@ -276,15 +282,17 @@ namespace CoreTest
 			}
 			catch(Exception e)
             {
+				Console.WriteLine(e.Message);
 				a = 1;
                 try
                 {
 					res1 = TestOneSampleByOther(args);
 				}
-				catch(Exception e1)
+				catch (Exception e1)
                 {
 					a = 2;
-                }
+					Console.WriteLine(e1.Message);
+				}
 				Assert.AreEqual(2, a);
 				return;
             }

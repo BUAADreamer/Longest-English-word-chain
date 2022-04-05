@@ -112,6 +112,59 @@ namespace ZFCore
 			return !(ch >= 'a' && ch <= 'z');
 		}
 
+		// 利用拓扑排序，把拓扑序在前但是不以 start 开头的点以及相关边删除掉，重新建图
+		// 用于加速指定起点后的有向无环图最长链计算
+		private void refactorGraph(char start) {
+			// 如果不需要删边，就直接返回
+			if (isInvalidChar(start)) {
+				return;
+			}
+
+			List<string> newWords = new List<string>();
+			HashSet<string> deletedWords = new HashSet<string>();
+			
+			Queue queue = new Queue();
+			Hashtable bufferInDegree = new Hashtable(inDegree);
+
+			// 把入度为 0 的点加入到队列中 
+			for (int i = 0; i < words.Count; i++)
+			{
+				if ((int)bufferInDegree[words[i]] == 0 && (words[i][0] != start))
+				{
+					queue.Enqueue(words[i]);
+				}
+			}
+
+			while (queue.Count != 0)
+			{
+				string cur = (string)queue.Dequeue();
+				deletedWords.Add(cur);
+				Hashtable curNext = (Hashtable)(graph[cur]);
+				foreach (DictionaryEntry next in curNext)
+				{
+					string key = (string)next.Key;
+					int degree = (int)bufferInDegree[key];
+					bufferInDegree[key] = degree - 1;
+					if (degree - 1 == 0 && key[0] != start)
+					{
+						queue.Enqueue(key);
+					}
+				}
+			}
+
+			for (int i = 0; i < words.Count; i++) 
+			{
+				if (!deletedWords.Contains(words[i])) 
+				{
+					newWords.Add(words[i]);
+				}
+			}
+
+			words = newWords;
+
+			buildGraph(graphMode);
+		}
+
 		// 使用拓扑排序检查数据是否有隐含环
 		private bool dataCheck()
 		{
@@ -153,30 +206,31 @@ namespace ZFCore
 			return false;
 		}
 
-		private void getWordChain(List<string> currentChain, string currentWord,
+		private void getWordChain(string currentChain, int wordCount, string currentWord,
 			char start, char end, HashSet<string> res, HashSet<string> usedWords)
 		{
-			currentChain.Add(currentWord);
 			usedWords.Add(currentWord);
+			// 保存currentChain + word组成的链
+			string currentChainString;
+			if (currentChain == "") 
+			{
+				currentChainString = currentWord;
+			} 
+			else 
+			{
+				currentChainString = currentChain + " " + currentWord;
+			}
 			
-			if (currentChain.Count > 1 
+			// 看是否能加入到所有链的答案中
+			if (wordCount >= 1 
 				&& (currentWord[currentWord.Length - 1] == end || isInvalidChar(end)))
 			{
 				chainCount++;
 				// 如果字符数没有超过限制，则保存字符串，否则只增加计数器，减少内存消耗
 				if (totalCharCount < MAXLEN)
 				{
-					string currentChainString = "";
-					for (int i = 0; i < currentChain.Count; i++)
-					{
-						currentChainString += currentChain[i];
-						if (i != currentChain.Count - 1)
-						{
-							currentChainString += " ";
-						}
-					}
 					res.Add(currentChainString);
-					totalCharCount += currentChain.Count;
+					totalCharCount += currentChainString.Length;
 				}
 			}
 
@@ -187,12 +241,12 @@ namespace ZFCore
 				string nextWord = (string)de.Key;
 				if (!usedWords.Contains(nextWord))
 				{
-					getWordChain(currentChain, nextWord, start, end, res, usedWords);
+					getWordChain(currentChainString, wordCount + 1, nextWord, 
+						start, end, res, usedWords);
 				}
 			}
 
 			// 回溯删除当前单词
-			currentChain.RemoveAt(currentChain.Count - 1);
 			usedWords.Remove(currentWord);
 		}
 
@@ -214,9 +268,8 @@ namespace ZFCore
 				string word = words[i];
 				if (word[0] == start || isInvalidChar(start))
 				{
-					List<string> chain = new List<string>();
 					HashSet<string> usedWords = new HashSet<string>();
-					getWordChain(chain, word, start, end, chainSet, usedWords);
+					getWordChain("", 0, word, start, end, chainSet, usedWords);
 				}
 			}
 			foreach (string str in chainSet)
@@ -458,6 +511,7 @@ namespace ZFCore
 
 			if (!enableLoop)
 			{
+				refactorGraph(start);
 				// return trivialGetMaxWordCountChain(start, end, res);
 				return fastGetMaxWordCountChain(start, end, res);
 			}
@@ -477,6 +531,7 @@ namespace ZFCore
 			
 			if (!enableLoop)
 			{
+				refactorGraph(start);
 				// return trivialGetMaxWordCountChain(start, end, res);
 				return fastGetMaxAlphabetCountChain(start, end, res);
 			}
