@@ -227,7 +227,7 @@ namespace Core
 			{
 				chainCount++;
 				// 如果字符数没有超过限制，则保存字符串，否则只增加计数器，减少内存消耗
-				if (totalCharCount < MAXLEN)
+				if (chainCount <= MAXLEN)
 				{
 					res.Add(currentChainString);
 					totalCharCount += currentChainString.Length;
@@ -272,9 +272,12 @@ namespace Core
 					getWordChain("", 0, word, start, end, chainSet, usedWords);
 				}
 			}
-			foreach (string str in chainSet)
+			if (chainCount <= MAXLEN)
 			{
-				res.Add(str);
+				foreach (string str in chainSet)
+				{
+					res.Add(str);
+				}
 			}
 			return chainCount;
 		}
