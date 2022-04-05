@@ -247,7 +247,7 @@ namespace CoreTest
 
 			res = new List<string>();
 			PairTestInterface.gen_chain_char(words, res, 'i', 'e', true);
-			Assert.AreEqual(res.Count, 0);
+			Assert.AreEqual(res.Count, 1);
 
 			res = new List<string>();
 			PairTestInterface.gen_chain_char(words, res, 'h', 't', false);

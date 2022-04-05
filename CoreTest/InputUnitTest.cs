@@ -12,7 +12,7 @@ namespace CoreTest
 			string[] args = { "-w" ,"-t","a"};
 			CommandParser commandParser = new CommandParser(args);
 			ParseRes parseRes = commandParser.getParseRes();
-			Assert.AreEqual(parseRes.mode,1);
+			Assert.AreEqual(parseRes.mode,0);
 			Assert.AreEqual(parseRes.end, 'a');
 		}
 	}
