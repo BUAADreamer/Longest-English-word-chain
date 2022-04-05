@@ -503,13 +503,14 @@ namespace Core
 		public int getMaxWordCountChain(char start, char end, bool enableLoop, List<string> res)
 		{
 			// 如果不允许有环，并且数据中确实有环
-			if (!enableLoop && !dataCheck())
+			bool ok = dataCheck();
+			if (!enableLoop && !ok)
 			{
 				// TODO：数据有环的异常
 				throw new HasImplicitLoopException("");
 			}
 
-			if (!enableLoop)
+			if (ok)
 			{
 				refactorGraph(start);
 				// return trivialGetMaxWordCountChain(start, end, res);
@@ -523,13 +524,14 @@ namespace Core
 
 		public int getMaxAlphabetCountChain(char start, char end, bool enableLoop, List<string> res)
 		{
+			bool ok = dataCheck();
 			// 如果需要检查是否有隐含环
-			if (!enableLoop && !dataCheck())
+			if (!enableLoop && !ok)
 			{
 				throw new HasImplicitLoopException("");
 			}
 			
-			if (!enableLoop)
+			if (ok)
 			{
 				refactorGraph(start);
 				// return trivialGetMaxWordCountChain(start, end, res);
