@@ -251,7 +251,7 @@ namespace CoreTest
 
 			res = new List<string>();
 			PairTestInterface.gen_chain_char(words, res, 'h', 't', false);
-			Assert.AreEqual(res.Count, 1);
+			Assert.AreEqual(res.Count, 0);
 		}
 
 		public Hashtable getValidCharPair()
