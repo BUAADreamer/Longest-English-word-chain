@@ -203,9 +203,13 @@ namespace Library
             {
                 if (args[pos].Length >= 1 && args[pos][0] == '-')
                 {
-                    if (args[pos].Length != 2 || !validCmdChars.Contains(args[pos][1]))
+                    if (args[pos].Length != 2)
                     {
                         throw new CommandInvalidException("invalid arg at pos " + pos + ", should be like: -n");
+                    }
+                    if (!validCmdChars.Contains(args[pos][1]))
+                    {
+                        throw new CommandInvalidException("invalid command char "+ args[pos][1]);
                     }
                     char c = args[pos][1];
                     if (char2ap.ContainsKey(c))
@@ -239,7 +243,7 @@ namespace Library
                         hasMainCmdChar = true;
                         mode = 0;
                     }
-                    else
+                    else if(c=='n')
                     {
                         hasMainCmdChar = true;
                         mode = 1;
@@ -248,6 +252,10 @@ namespace Library
                 }
                 else
                 {
+                    if(args[pos].Length==1 && validCmdChars.Contains(args[pos][0]))
+                    {
+                        throw new CommandInvalidException("lack - before "+ args[pos][0]);
+                    }
                     if (pos != args.Length - 1)
                     {
                         throw new CommandInvalidException("invalid arg at pos " + pos + ",file path should be at the end!!");
